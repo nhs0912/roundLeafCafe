@@ -1,6 +1,6 @@
-package com.ypdchurch.config;
+package com.ypdchurch.roundleafcafe.config;
 
-import com.ypdchurch.member.enums.MemberRole;
+import com.ypdchurch.roundleafcafe.enums.MemberRole;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

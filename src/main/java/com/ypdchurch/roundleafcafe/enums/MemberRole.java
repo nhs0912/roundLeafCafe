@@ -1,4 +1,4 @@
-package com.ypdchurch.member.enums;
+package com.ypdchurch.roundleafcafe.enums;
 
 public enum MemberRole {
     ADMIN, MEMBER
