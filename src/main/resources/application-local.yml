@@ -13,6 +13,10 @@ spring:
 #  sql:
 #    init:
 #      mode: always
+  security:
+    user:
+      name: nhs0912
+      password: 1234
 
   jpa:
     hibernate:
@@ -31,4 +35,3 @@ logging:
       org.hibernate.type: error
       org.springframework.boot.autoconfigure: error
       org.apache.coyote.http11: debug
-
