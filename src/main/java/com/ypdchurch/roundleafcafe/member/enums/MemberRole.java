@@ -1,5 +1,5 @@
 package com.ypdchurch.roundleafcafe.member.enums;
 
 public enum MemberRole {
-    ADMIN, MEMBER
+    ADMIN, MANAGER, STAFF, CUSTOMER
 }

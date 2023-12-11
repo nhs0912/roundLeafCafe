@@ -1,4 +1,4 @@
-package com.ypdchurch.roundleafcafe.config;
+package com.ypdchurch.roundleafcafe.common.config;
 
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import lombok.extern.slf4j.Slf4j;
@@ -42,13 +42,21 @@ public class SecurityConfig {
                 .headers(header -> header.frameOptions((HeadersConfigurer.FrameOptionsConfig::disable))) //iframe 해제
 
                 .authorizeHttpRequests(request -> {
-                    request.requestMatchers(antMatcher("/")).permitAll();
                     request.requestMatchers(PathRequest.toH2Console()).permitAll();
                     request.requestMatchers(antMatcher("/login")).permitAll();
                     request.requestMatchers(antMatcher("/admin")).hasRole(MemberRole.ADMIN.name());
-                    request.requestMatchers(antMatcher("/api/**")).hasRole(MemberRole.MEMBER.name())
+                    request.requestMatchers(antMatcher("/api/customer/**")).hasRole(MemberRole.CUSTOMER.name());
+
+                    request.requestMatchers(antMatcher("/api/manager/**")).hasRole(MemberRole.MANAGER.name());
+                    request.requestMatchers(antMatcher("/api/staff/**")).hasRole(MemberRole.STAFF.name())
                             .anyRequest().authenticated();
                 })
+
+
+                .exceptionHandling(custom -> custom.authenticationEntryPoint((request, response, authException) -> {
+                    log.warn("인증되지 않은 사용자가 자원에 접근하려 합니다 : " + authException.getMessage());
+                    throw new IllegalAccessError("인증되지 않은 사용자가 자원에 접근하려 합니다");
+                }))
 
                 //jSessionId 사용 거부
                 .sessionManagement(sessionManegement
