@@ -5,9 +5,12 @@ import com.ypdchurch.roundleafcafe.member.enums.MemberGrade;
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import com.ypdchurch.roundleafcafe.member.enums.MemberStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Entity
 public class Member extends BaseEntity {
 
@@ -34,7 +37,6 @@ public class Member extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private MemberRole role;
-
 
 
 }

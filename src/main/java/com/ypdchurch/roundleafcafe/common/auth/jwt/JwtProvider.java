@@ -16,20 +16,18 @@ import static com.auth0.jwt.JWT.require;
 @Component
 public class JwtProvider {
     private static final String SUBJECT = "roundleafcafe";
-
     private static final int ONE_DAY = 1000 * 60 * 60 * 24; // 24시간
     private static final int TWO_DAY = 1000 * 60 * 60 * 48; // 48시간
     public static final String TOKEN_PREFIX = "Bearer "; // 스페이스 필요함
     public static final String HEADER = "Authorization";
-    private static final String SECRET = "roundleafcafe";
-
 
     public static String createAccessToken(Member member) {
         String jwt = JWT.create()
                 .withSubject(SUBJECT)
                 .withExpiresAt(new Date(System.currentTimeMillis() + ONE_DAY))
                 .withClaim("id", member.getId())
-                .sign(Algorithm.HMAC512(SECRET));
+                .withClaim("role", member.getRole().name())
+                .sign(Algorithm.HMAC512(JwtVO.SECRET));
         return TOKEN_PREFIX + jwt;
     }
 
@@ -39,12 +37,12 @@ public class JwtProvider {
                 .withExpiresAt(new Date(System.currentTimeMillis() + TWO_DAY))
                 .withClaim("id", member.getId())
                 .withClaim("AccessToken", accessToken)
-                .sign(Algorithm.HMAC512(SECRET));
+                .sign(Algorithm.HMAC512(JwtVO.SECRET));
         return TOKEN_PREFIX + jwt;
     }
 
     public static DecodedJWT verify(String jwt) throws SignatureVerificationException, TokenExpiredException {
-        DecodedJWT decodedJWT = require(Algorithm.HMAC512(SECRET))
+        DecodedJWT decodedJWT = require(Algorithm.HMAC512(JwtVO.SECRET))
                 .build().verify(jwt);
         return decodedJWT;
     }
