@@ -1,10 +1,13 @@
 package com.ypdchurch.roundleafcafe.common.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ypdchurch.roundleafcafe.common.dto.ResponseDTO;
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -41,6 +44,17 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable) //formLogin 해제
                 .headers(header -> header.frameOptions((HeadersConfigurer.FrameOptionsConfig::disable))) //iframe 해제
 
+                .exceptionHandling(custom -> custom.authenticationEntryPoint((request, response, authException) -> {
+                    ObjectMapper om = new ObjectMapper();
+                    ResponseDTO<?> responseDTO = new ResponseDTO<>(HttpStatus.FORBIDDEN, "권한없음", null);
+                    String responseBody = om.writeValueAsString(responseDTO);
+                    response.setContentType("application/json;charset=utf-8");
+                    response.setStatus(403);
+                    response.getWriter().println(responseBody);
+//                    log.warn("인증되지 않은 사용자가 자원에 접근하려 합니다 : " + authException.getMessage());
+//                    throw new IllegalAccessError("인증되지 않은 사용자가 자원에 접근하려 합니다");
+                }))
+
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers(PathRequest.toH2Console()).permitAll();
                     request.requestMatchers(antMatcher("/login")).permitAll();
@@ -53,10 +67,7 @@ public class SecurityConfig {
                 })
 
 
-                .exceptionHandling(custom -> custom.authenticationEntryPoint((request, response, authException) -> {
-                    log.warn("인증되지 않은 사용자가 자원에 접근하려 합니다 : " + authException.getMessage());
-                    throw new IllegalAccessError("인증되지 않은 사용자가 자원에 접근하려 합니다");
-                }))
+
 
                 //jSessionId 사용 거부
                 .sessionManagement(sessionManegement
