@@ -23,7 +23,6 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 @Slf4j
 @Configuration
 public class SecurityConfig {
-
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
