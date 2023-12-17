@@ -18,8 +18,8 @@ import java.util.Optional;
 
 import static com.ypdchurch.roundleafcafe.member.service.MemberService.JoinRequestDto;
 import static com.ypdchurch.roundleafcafe.member.service.MemberService.JoinResponseDto;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -66,7 +66,12 @@ class MemberServiceTest {
         //when
         JoinResponseDto joinResponseDto = memberService.registerMember(joinRequestDto);
         //then
-        assertThat(joinResponseDto.getEmail()).isEqualTo("tom@gmail.com");
+        assertSoftly(softly -> {
+                    softly.assertThat(joinResponseDto.getId()).isEqualTo(1L);
+                    softly.assertThat(joinResponseDto.getName()).isEqualTo("tom");
+                    softly.assertThat(joinResponseDto.getEmail()).isEqualTo("tom@gmail.com");
+                }
+        );
     }
 
     @Test
