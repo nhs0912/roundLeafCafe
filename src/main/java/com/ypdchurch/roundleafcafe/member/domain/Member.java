@@ -40,7 +40,6 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MemberGrade grade;
 
-    @NotEmpty
     @Enumerated(EnumType.STRING)
     private MemberRole role;
 

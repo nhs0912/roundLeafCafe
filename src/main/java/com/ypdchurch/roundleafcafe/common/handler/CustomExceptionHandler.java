@@ -2,6 +2,7 @@ package com.ypdchurch.roundleafcafe.common.handler;
 
 import com.ypdchurch.roundleafcafe.common.dto.ResponseDTO;
 import com.ypdchurch.roundleafcafe.common.exception.CustomApiException;
+import com.ypdchurch.roundleafcafe.common.exception.CustomValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,14 @@ public class CustomExceptionHandler {
         log.error(e.getMessage());
         return new ResponseEntity<>(
                 new ResponseDTO<>(HttpStatus.BAD_REQUEST, e.getMessage(), null), HttpStatus.BAD_REQUEST);
+
+    }
+
+    @ExceptionHandler(CustomValidationException.class)
+    public ResponseEntity<?> validationApiException(CustomValidationException e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>(
+                new ResponseDTO<>(HttpStatus.BAD_REQUEST, e.getMessage(), e.getErrorMap()), HttpStatus.BAD_REQUEST);
 
     }
 }
