@@ -4,15 +4,13 @@ import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.enums.MemberGrade;
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import com.ypdchurch.roundleafcafe.member.enums.MemberStatus;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 public class JoinRequestDto {
     private String name;
     private String password;

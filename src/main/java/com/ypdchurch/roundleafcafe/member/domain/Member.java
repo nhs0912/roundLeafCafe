@@ -5,6 +5,7 @@ import com.ypdchurch.roundleafcafe.member.enums.MemberGrade;
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import com.ypdchurch.roundleafcafe.member.enums.MemberStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -20,22 +21,26 @@ public class Member extends BaseEntity {
     @Column(name = "id", updatable = false)
     private Long id;
 
+    @NotEmpty
     @Column(name = "password", nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
+    @NotEmpty
     @Column
     private String name;
 
     private String phoneNumber;
 
+    @NotEmpty
     private String email;
 
     @Enumerated(EnumType.STRING)
     private MemberGrade grade;
 
+    @NotEmpty
     @Enumerated(EnumType.STRING)
     private MemberRole role;
 
