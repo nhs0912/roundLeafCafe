@@ -1,15 +1,13 @@
 package com.ypdchurch.roundleafcafe.member.service;
 
 import com.ypdchurch.roundleafcafe.common.dto.ResponseDTO;
+import com.ypdchurch.roundleafcafe.common.exception.CustomApiException;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.enums.MemberGrade;
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import com.ypdchurch.roundleafcafe.member.enums.MemberStatus;
 import com.ypdchurch.roundleafcafe.member.repository.MemberRepository;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,26 +21,37 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Transactional
-    public ResponseDTO<Member> registerMember(JoinRequestDto joinRequestDto) throws IllegalAccessException {
+    public JoinResponseDto registerMember(JoinRequestDto joinRequestDto) throws IllegalAccessException {
 
         // 1. 동일 유저가 있는지 검사
         Optional<Member> optionalMember = memberRepository.findByEmail(joinRequestDto.email);
-        if(optionalMember.isPresent()){
-            throw new IllegalAccessException("중복된 이메일 입니다.");
+        if (optionalMember.isPresent()) {
+            throw new CustomApiException("등록된 이메일이 존재합니다.");
         }
         // 2. password encoding
-        String encodedPassword = bCryptPasswordEncoder.encode(joinRequestDto.getPassword());
-        JoinRequestDto saveEncodePasswordJoinRequestDto = joinRequestDto.saveEncodePassword(encodedPassword);
-        Member member = memberRepository.save(saveEncodePasswordJoinRequestDto.toEntity());
+        Member member = memberRepository.save(joinRequestDto.toEntity(passwordEncoder));
 
         // 3. dto response
-        ResponseDTO<Member> responseDTO = new ResponseDTO<>();
-        return responseDTO;
+        return new JoinResponseDto(member);
     }
 
+
+    @Getter
+    @Setter
+    public static class JoinResponseDto {
+        private Long id;
+        private String name;
+        private String email;
+
+        public JoinResponseDto(Member member) {
+            this.id = member.getId();
+            this.name = member.getName();
+            this.email = member.getEmail();
+        }
+    }
 
     @Getter
     @Setter
@@ -56,25 +65,15 @@ public class MemberService {
         private MemberRole role;
         private MemberStatus status;
 
-        public JoinRequestDto saveEncodePassword(String encodedPassword){
-            return JoinRequestDto.builder()
-                    .email(this.email)
-                    .password(encodedPassword)
-                    .name(this.name)
-                    .phoneNumber(this.phoneNumber)
-                    .grade(this.grade)
-                    .role(this.role)
-                    .status(this.status)
-                    .build();
-        }
-
-        public Member toEntity() {
+        public Member toEntity(BCryptPasswordEncoder bCryptPasswordEncoder) {
             return Member.builder()
                     .name(this.name)
                     .email(this.email)
-                    .password(this.password)
+                    .password(bCryptPasswordEncoder.encode(this.password))
+                    .phoneNumber(this.phoneNumber)
                     .grade(this.grade)
                     .role(this.role)
+                    .status(MemberStatus.ACTIVE)
                     .build();
         }
     }
