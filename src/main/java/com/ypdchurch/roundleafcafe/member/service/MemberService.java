@@ -27,7 +27,7 @@ public class MemberService {
     public JoinResponseDto registerMember(JoinRequestDto joinRequestDto) throws IllegalAccessException {
 
         // 1. 동일 유저가 있는지 검사
-        Optional<Member> optionalMember = memberRepository.findByEmail(joinRequestDto.email);
+        Optional<Member> optionalMember = memberRepository.findByEmail(joinRequestDto.getEmail());
         if (optionalMember.isPresent()) {
             throw new CustomApiException("등록된 이메일이 존재합니다.");
         }
@@ -55,7 +55,7 @@ public class MemberService {
 
     @Getter
     @Setter
-    @Builder
+    @ToString
     public static class JoinRequestDto {
         private String name;
         private String password;
@@ -64,6 +64,14 @@ public class MemberService {
         private MemberGrade grade;
         private MemberRole role;
         private MemberStatus status;
+
+        @Builder
+        public JoinRequestDto(String name, String password, String email, String phoneNumber) {
+            this.name = name;
+            this.password = password;
+            this.email = email;
+            this.phoneNumber = phoneNumber;
+        }
 
         public Member toEntity(BCryptPasswordEncoder bCryptPasswordEncoder) {
             return Member.builder()

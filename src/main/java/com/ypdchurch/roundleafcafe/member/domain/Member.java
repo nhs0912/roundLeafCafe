@@ -6,9 +6,10 @@ import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import com.ypdchurch.roundleafcafe.member.enums.MemberStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@Builder
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
