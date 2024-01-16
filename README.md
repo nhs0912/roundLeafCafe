@@ -11,7 +11,6 @@
 - 관리자 로그인 기능
 - 관리자 모드
 
-
 ## 달란트
 
 - 달란트 충전(현금으로 충전)
@@ -31,7 +30,14 @@
 - 장바구니 메뉴 담아서 한번에 주문
 
 ## [Domain]
-### 멤버
-### 주문
-### 달란트
-### Token
+### 1) 멤버
+### 2) 주문
+### 3) 달란트
+### 4) 달란트_이체
+### 5) Token
+
+# ERD
+![erd240116](https://github.com/f-lab-edu/roundLeafCafe/assets/12823689/ca43dae8-5ee7-4fbe-9c19-9d87f0d81fa7)
+
+# Infra
+![roundLeafCafe_infra](https://github.com/f-lab-edu/roundLeafCafe/assets/12823689/57df7fd8-d7ff-4404-ada5-f4de601e1047)
