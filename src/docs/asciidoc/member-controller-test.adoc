@@ -1,5 +1,10 @@
-include::{snippets}/member-controller-test/join-success-test/curl-request.adoc[]
+= memberController API
+:toc:
+
+== Member가입
+
+=== Request
 include::{snippets}/member-controller-test/join-success-test/http-request.adoc[]
-include::{snippets}/member-controller-test/join-success-test/request-body.adoc[]
+
+===  Response
 include::{snippets}/member-controller-test/join-success-test/http-response.adoc[]
-include::{snippets}/member-controller-test/join-success-test/response-body.adoc[]
