@@ -1,7 +1,10 @@
 = memberController API
-:toc:
+:doctype: book
+:toc: left
+:source-highlighter: highlightjs
+:setlinks:
 
-== Member가입
+== Member 가입
 
 === Request
 include::{snippets}/member-controller-test/join-success-test/http-request.adoc[]
