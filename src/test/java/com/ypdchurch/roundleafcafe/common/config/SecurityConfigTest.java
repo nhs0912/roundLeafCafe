@@ -25,10 +25,7 @@ class SecurityConfigTest {
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/admin"));
         String responseBody = resultActions.andReturn().getResponse().getContentAsString();
         int httpStatusCode = resultActions.andReturn().getResponse().getStatus();
-        System.out.println("test heeseok: " + responseBody);
-        System.out.println("test heeseok: " + httpStatusCode);
         Assertions.assertThat(httpStatusCode).isEqualTo(HttpStatus.UNAUTHORIZED.value());
-
         //then
     }
 

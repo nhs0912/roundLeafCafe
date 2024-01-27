@@ -1,5 +1,6 @@
 package com.ypdchurch.roundleafcafe.common.config;
 
+import com.ypdchurch.roundleafcafe.common.util.CustomResponseUtil;
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -51,10 +52,10 @@ public class SecurityConfig {
                     request.requestMatchers(antMatcher("/api/staff/**")).hasRole(MemberRole.STAFF.name())
                             .anyRequest().authenticated();
                 })
-//                .exceptionHandling(custom -> custom.authenticationEntryPoint((request, response, authException) -> {
-//                    log.error("heeseok response = {}", response);
-//                    CustomResponseUtil.unAuthentication(response, "로그인을 해야합니다.");
-//                }))
+                .exceptionHandling(custom -> custom.authenticationEntryPoint((request, response, authException) -> {
+                    log.error("heeseok response = {}", response);
+                    CustomResponseUtil.unAuthentication(response, "로그인을 해야합니다.");
+                }))
 
                 //jSessionId 사용 거부
                 .sessionManagement(sessionManegement
