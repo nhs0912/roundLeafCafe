@@ -4,14 +4,14 @@ import com.ypdchurch.roundleafcafe.common.exception.CustomApiException;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import com.ypdchurch.roundleafcafe.member.repository.MemberRepository;
-import com.ypdchurch.roundleafcafe.member.service.dto.JoinRequestDto;
-import com.ypdchurch.roundleafcafe.member.service.dto.JoinResponseDto;
+import com.ypdchurch.roundleafcafe.member.controller.dto.JoinRequestDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @InjectMocks
     private MemberService memberService;
@@ -59,12 +60,12 @@ class MemberServiceTest {
         when(memberRepository.save(any())).thenReturn(member);
 
         //when
-        JoinResponseDto joinResponseDto = memberService.registerMember(joinRequestDto);
+        Member registeredMember = memberService.registerMember(member);
         //then
         assertSoftly(softly -> {
-                    softly.assertThat(joinResponseDto.getId()).isEqualTo(1L);
-                    softly.assertThat(joinResponseDto.getName()).isEqualTo("tom");
-                    softly.assertThat(joinResponseDto.getEmail()).isEqualTo("tom@gmail.com");
+                    softly.assertThat(registeredMember.getId()).isEqualTo(1L);
+                    softly.assertThat(registeredMember.getName()).isEqualTo("tom");
+                    softly.assertThat(registeredMember.getEmail()).isEqualTo("tom@gmail.com");
                 }
         );
     }
@@ -80,19 +81,18 @@ class MemberServiceTest {
                 .phoneNumber("01012345678")
                 .build();
 
+        Member requestMember = joinRequestDto.toEntity(passwordEncoder);
+
         //stub1
-        when(memberRepository.findByEmail(any())).thenReturn(
-                Optional.of(Member.builder()
-                        .id(1L)
-                        .name("tom")
-                        .password("1234")
-                        .email("tom@gmail.com")
-                        .phoneNumber("01012345678")
-                        .build()));
+        when(memberRepository.findByEmail(any())).thenReturn(Optional.ofNullable(requestMember));
         //when
         //then
         assertThatThrownBy(() ->
-                memberService.registerMember(joinRequestDto))
+        {
+            if (requestMember != null) {
+                memberService.registerMember(requestMember);
+            }
+        })
                 .isInstanceOf(CustomApiException.class)
                 .hasMessage("등록된 이메일이 존재합니다.");
     }

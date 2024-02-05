@@ -43,8 +43,10 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers(PathRequest.toH2Console()).permitAll();
+                    request.requestMatchers(antMatcher("/")).permitAll();
+                    request.requestMatchers(antMatcher("/home")).permitAll();
                     request.requestMatchers(antMatcher("/login")).permitAll();
-                    request.requestMatchers(antMatcher("/api/**")).permitAll();
+                    request.requestMatchers(antMatcher("/api/member/**")).permitAll();
                     request.requestMatchers(antMatcher("/admin")).hasRole(MemberRole.ADMIN.name());
                     request.requestMatchers(antMatcher("/api/customer/**")).hasRole(MemberRole.CUSTOMER.name());
 

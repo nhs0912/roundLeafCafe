@@ -1,4 +1,4 @@
-package com.ypdchurch.roundleafcafe.member.service.dto;
+package com.ypdchurch.roundleafcafe.member.controller.dto;
 
 import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.enums.MemberGrade;
