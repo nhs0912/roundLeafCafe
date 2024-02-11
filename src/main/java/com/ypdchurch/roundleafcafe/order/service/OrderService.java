@@ -1,12 +1,12 @@
 package com.ypdchurch.roundleafcafe.order.service;
 
-import com.ypdchurch.roundleafcafe.order.domain.Order;
+import com.ypdchurch.roundleafcafe.order.domain.Orders;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OrderService {
 
-    public Order orderMenu() {
+    public Orders orderMenu() {
         return null;
     }
 }
