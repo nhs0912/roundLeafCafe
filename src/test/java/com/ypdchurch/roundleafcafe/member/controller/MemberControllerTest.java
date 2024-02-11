@@ -76,10 +76,10 @@ class MemberControllerTest {
                                 fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
                                 fieldWithPath("password").type(JsonFieldType.STRING).description("password"),
                                 fieldWithPath("email").type(JsonFieldType.STRING).description("email"),
-                                fieldWithPath("phoneNumber").type(JsonFieldType.STRING).description("phoneNumber"),
-                                fieldWithPath("grade").type(JsonFieldType.STRING).description("grade"),
-                                fieldWithPath("role").type(JsonFieldType.STRING).description("role"),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description("status")
+                                fieldWithPath("phoneNumber").type(JsonFieldType.STRING).description("핸드폰번호"),
+                                fieldWithPath("grade").type(JsonFieldType.STRING).description("등급"),
+                                fieldWithPath("role").type(JsonFieldType.STRING).description("역할"),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("상태")
                         ), responseFields(
                                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("id"),
                                 fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),

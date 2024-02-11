@@ -463,10 +463,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h3 id="_request">Request</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/join HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/member/join HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Accept: application/json
-Content-Length: 159
+Content-Length: 173
 Host: api.roundLeafCafe.com
 
 {
@@ -474,9 +474,9 @@ Host: api.roundLeafCafe.com
   "password" : "1234",
   "email" : "tom@gmail.com",
   "phoneNumber" : "01012345678",
-  "grade" : null,
-  "role" : null,
-  "status" : null
+  "grade" : "NORMAL",
+  "role" : "CUSTOMER",
+  "status" : "ACTIVE"
 }</code></pre>
 </div>
 </div>
@@ -485,7 +485,7 @@ Host: api.roundLeafCafe.com
 <h3 id="_response">Response</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
@@ -496,16 +496,12 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 Strict-Transport-Security: max-age=31536000 ; includeSubDomains
-Content-Length: 139
+Content-Length: 61
 
 {
-  "status" : 201,
-  "message" : "회원가입 성공",
-  "data" : {
-    "id" : 1,
-    "name" : "tom",
-    "email" : "tom@gmail.com"
-  }
+  "id" : 1,
+  "name" : "tom",
+  "email" : "tom@gmail.com"
 }</code></pre>
 </div>
 </div>
@@ -516,7 +512,7 @@ Content-Length: 139
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-01-25 23:30:50 +0900
+Last updated 2024-02-11 15:40:48 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
