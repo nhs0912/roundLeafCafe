@@ -4,7 +4,7 @@ import com.ypdchurch.roundleafcafe.common.exception.CustomApiException;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import com.ypdchurch.roundleafcafe.member.repository.MemberRepository;
-import com.ypdchurch.roundleafcafe.member.controller.dto.JoinRequestDto;
+import com.ypdchurch.roundleafcafe.member.controller.dto.JoinRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +35,7 @@ class MemberServiceTest {
     @DisplayName("회원 가입 테스트")
     public void registerMemberTest() throws IllegalAccessException {
         //given
-        JoinRequestDto joinRequestDto = JoinRequestDto.builder()
+        JoinRequest joinRequest = JoinRequest.builder()
                 .name("tom")
                 .password("1234")
                 .email("tom@gmail.com")
@@ -74,14 +74,14 @@ class MemberServiceTest {
     @DisplayName("회원 가입 중복체크 테스트 ")
     public void registerMemberDuplicationCheckTest() throws IllegalAccessException {
         //given
-        JoinRequestDto joinRequestDto = JoinRequestDto.builder()
+        JoinRequest joinRequest = JoinRequest.builder()
                 .name("tom")
                 .password("1234")
                 .email("tom@gmail.com")
                 .phoneNumber("01012345678")
                 .build();
 
-        Member requestMember = joinRequestDto.toEntity(passwordEncoder);
+        Member requestMember = joinRequest.toEntity(passwordEncoder);
 
         //stub1
         when(memberRepository.findByEmail(any())).thenReturn(Optional.ofNullable(requestMember));

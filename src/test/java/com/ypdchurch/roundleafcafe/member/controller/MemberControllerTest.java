@@ -1,7 +1,7 @@
 package com.ypdchurch.roundleafcafe.member.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ypdchurch.roundleafcafe.member.controller.dto.JoinRequestDto;
+import com.ypdchurch.roundleafcafe.member.controller.dto.JoinRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,14 +44,14 @@ class MemberControllerTest {
     void joinSuccessTest() throws Exception {
 
         //give
-        JoinRequestDto joinRequestDto = JoinRequestDto.builder()
+        JoinRequest joinRequest = JoinRequest.builder()
                 .name("tom")
                 .password("1234")
                 .email("tom@gmail.com")
                 .phoneNumber("01012345678")
                 .build();
         ObjectMapper objectMapper = new ObjectMapper();
-        String joinRequestJson = objectMapper.writeValueAsString(joinRequestDto);
+        String joinRequestJson = objectMapper.writeValueAsString(joinRequest);
 
         ResultActions result = mockMvc.perform(post("/api/member/join")
                         .accept(MediaType.APPLICATION_JSON)
