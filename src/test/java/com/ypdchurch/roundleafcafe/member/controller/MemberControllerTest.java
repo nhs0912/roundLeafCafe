@@ -1,7 +1,7 @@
 package com.ypdchurch.roundleafcafe.member.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ypdchurch.roundleafcafe.member.service.dto.JoinRequestDto;
+import com.ypdchurch.roundleafcafe.member.controller.dto.JoinRequestDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +33,7 @@ class MemberControllerTest {
     @Test
     @DisplayName("api doc test sample")
     void sampleTest() throws Exception {
-        mockMvc.perform(get("/api/join")
+        mockMvc.perform(get("/api/member/join")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk());
@@ -53,7 +53,7 @@ class MemberControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         String joinRequestJson = objectMapper.writeValueAsString(joinRequestDto);
 
-        ResultActions result = mockMvc.perform(post("/api/join")
+        ResultActions result = mockMvc.perform(post("/api/member/join")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(joinRequestJson))
@@ -67,7 +67,10 @@ class MemberControllerTest {
 //                                fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
 //                                fieldWithPath("password").type(JsonFieldType.STRING).description("password"),
 //                                fieldWithPath("email").type(JsonFieldType.STRING).description("email"),
-//                                fieldWithPath("phoneNumber").type(JsonFieldType.STRING).description("phoneNumber")
+//                                fieldWithPath("phoneNumber").type(JsonFieldType.STRING).description("phoneNumber"),
+//                                fieldWithPath("grade").type(JsonFieldType.STRING).description("grade"),
+//                                fieldWithPath("role").type(JsonFieldType.STRING).description("role"),
+//                                fieldWithPath("status").type(JsonFieldType.STRING).description("status")
 //                        ), responseFields(
 //                                fieldWithPath("status").type(JsonFieldType.NUMBER).description("response status"),
 //                                fieldWithPath("message").type(JsonFieldType.STRING).description("message"),
