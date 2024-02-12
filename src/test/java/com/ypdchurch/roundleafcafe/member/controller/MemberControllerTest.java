@@ -68,7 +68,7 @@ class MemberControllerTest {
                         .content(joinRequestJson))
                 .andDo(MockMvcResultHandlers.print());
 
-        result.andExpect(status().isOk())
+        result.andExpect(status().isCreated())
                 .andDo(document("{class-name}/{method-name}",
                         preprocessRequest(prettyPrint())
                         , preprocessResponse(prettyPrint())

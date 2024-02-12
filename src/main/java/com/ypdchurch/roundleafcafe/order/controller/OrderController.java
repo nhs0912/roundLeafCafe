@@ -1,10 +1,12 @@
 package com.ypdchurch.roundleafcafe.order.controller;
 
 import com.ypdchurch.roundleafcafe.order.controller.dto.OrderMenuRequest;
-import com.ypdchurch.roundleafcafe.order.domain.Orders;
-import com.ypdchurch.roundleafcafe.order.service.OrdersService;
+import com.ypdchurch.roundleafcafe.order.controller.dto.OrderMenuResponse;
+import com.ypdchurch.roundleafcafe.order.domain.Order;
+import com.ypdchurch.roundleafcafe.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -14,19 +16,21 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 @RestController
 public class OrderController {
-    private final OrdersService ordersService;
+    private final OrderService orderService;
 
-    @GetMapping("orderMenu")
+    @GetMapping("menu")
     public String moveOrderPage() {
         return "order";
     }
 
-    @PostMapping("/orderMenu")
-    public Orders orderMenu(@RequestBody OrderMenuRequest orderMenuRequest) {
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("menu")
+    public OrderMenuResponse orderMenu(@RequestBody OrderMenuRequest orderMenuRequest) {
         log.info("orderMenu 시작 = {} ", orderMenuRequest);
         validateInputOrderMenu(orderMenuRequest);
-        Orders orders = orderMenuRequest.toEntity();
-        return ordersService.orderMenu(orders);
+        Order order = orderMenuRequest.toEntity();
+        Order orderedMenu = orderService.orderMenu(order);
+        return OrderMenuResponse.of(orderedMenu);
     }
 
     private void validateInputOrderMenu(OrderMenuRequest orderMenuRequest) {

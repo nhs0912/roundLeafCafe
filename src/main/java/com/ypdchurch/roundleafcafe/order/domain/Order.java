@@ -1,13 +1,10 @@
 package com.ypdchurch.roundleafcafe.order.domain;
 
 import com.ypdchurch.roundleafcafe.common.domain.BaseEntity;
-import com.ypdchurch.roundleafcafe.order.enums.OrdersStatus;
+import com.ypdchurch.roundleafcafe.order.enums.OrderStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
@@ -16,23 +13,24 @@ import java.math.BigDecimal;
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Entity
-public class Orders extends BaseEntity {
+@ToString
+@Entity(name = "orders")
+public class Order extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "orders_id", updatable = false)
+    @Column(name = "order_id", updatable = false)
     private Long id;
 
-    @NotEmpty
+    @NotNull
     @Column(name = "member_id", updatable = false)
     private Long memberId;
 
-    @NotEmpty
-    @Column(name = "basket_id", updatable = false)
+    @NotNull
+    @Column(name = "basket_id")
     private Long basketId;
 
-    @NotEmpty
+    @NotNull
     @Column(name = "total_price")
     private BigDecimal totalPrice;
 
@@ -40,6 +38,6 @@ public class Orders extends BaseEntity {
     private String requests;
 
     @Enumerated(EnumType.STRING)
-    private OrdersStatus ordersStatus;
+    private OrderStatus orderStatus;
 
 }

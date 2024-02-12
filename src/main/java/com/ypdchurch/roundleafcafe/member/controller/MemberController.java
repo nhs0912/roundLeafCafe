@@ -6,6 +6,7 @@ import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,13 +24,12 @@ public class MemberController {
         return "join";
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/join")
     public JoinResponse join(@RequestBody JoinRequest joinRequest) {
 
         log.info("heeseok join.joinRequestDto = {} ", joinRequest);
         Member registeredMember = memberService.registerMember(joinRequest.toEntity(passwordEncoder));
-//        JoinResponse joinResponse = new JoinResponse(registeredMember);
-//        return new ResponseEntity<JoinResponse>(HttpStatus.CREATED);
         return new JoinResponse(registeredMember);
     }
 }

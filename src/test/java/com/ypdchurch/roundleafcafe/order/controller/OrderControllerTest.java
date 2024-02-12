@@ -7,7 +7,8 @@ import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import com.ypdchurch.roundleafcafe.member.enums.MemberStatus;
 import com.ypdchurch.roundleafcafe.member.service.MemberService;
 import com.ypdchurch.roundleafcafe.order.controller.dto.OrderMenuRequest;
-import com.ypdchurch.roundleafcafe.order.service.OrdersService;
+import com.ypdchurch.roundleafcafe.order.enums.OrderStatus;
+import com.ypdchurch.roundleafcafe.order.service.OrderService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +32,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+
 @ExtendWith({RestDocumentationExtension.class})
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "api.roundLeafCafe.com", uriPort = 443)
 @AutoConfigureMockMvc
@@ -40,7 +42,7 @@ class OrderControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private OrdersService ordersService;
+    private OrderService orderService;
 
     @Mock
     private MemberService memberService;
@@ -59,7 +61,9 @@ class OrderControllerTest {
                 .grade(MemberGrade.NORMAL)
                 .role(MemberRole.CUSTOMER)
                 .status(MemberStatus.ACTIVE)
+                .id(1L)
                 .build();
+
         when(memberService.registerMember(any()))
                 .thenReturn(tom);
 
@@ -67,12 +71,13 @@ class OrderControllerTest {
                 .memberId(tom.getId())
                 .basketId(1L)
                 .totalPrice(new BigDecimal(2000))
+                .orderStatus(OrderStatus.ORDER_ACCEPTED)
                 .build();
 
         ObjectMapper objectMapper = new ObjectMapper();
         String orderMenuRequestJson = objectMapper.writeValueAsString(orderMenuRequest);
 
-        ResultActions result = mockMvc.perform(post("/api/orders/orderMenu")
+        ResultActions result = mockMvc.perform(post("/api/orders/menu")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orderMenuRequestJson))

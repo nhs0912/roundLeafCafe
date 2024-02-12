@@ -1,7 +1,7 @@
 package com.ypdchurch.roundleafcafe.order.controller.dto;
 
-import com.ypdchurch.roundleafcafe.order.domain.Orders;
-import com.ypdchurch.roundleafcafe.order.enums.OrdersStatus;
+import com.ypdchurch.roundleafcafe.order.domain.Order;
+import com.ypdchurch.roundleafcafe.order.enums.OrderStatus;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -9,19 +9,22 @@ import java.math.BigDecimal;
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class OrderMenuRequest {
     private Long memberId;
     private Long basketId;
     private BigDecimal totalPrice;
     private String requests;
-    private OrdersStatus ordersStatus;
+    private OrderStatus orderStatus;
 
-    public Orders toEntity(){
-        return Orders.builder()
-                .memberId(this.memberId)
-                .totalPrice(this.totalPrice)
-                .requests(this.requests)
-                .ordersStatus(OrdersStatus.ORDER_ACCEPTED)
+    public Order toEntity() {
+        return Order.builder()
+                .memberId(this.getMemberId())
+                .totalPrice(this.getTotalPrice())
+                .requests(this.getRequests())
+                .orderStatus(this.getOrderStatus())
+                .basketId(this.getBasketId())
                 .build();
     }
 }
