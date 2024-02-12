@@ -1,8 +1,9 @@
 package com.ypdchurch.roundleafcafe.order.domain;
 
 import com.ypdchurch.roundleafcafe.common.domain.BaseEntity;
-import com.ypdchurch.roundleafcafe.order.enums.OrderStatus;
+import com.ypdchurch.roundleafcafe.order.enums.OrdersStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,12 +24,15 @@ public class Orders extends BaseEntity {
     @Column(name = "orders_id", updatable = false)
     private Long id;
 
+    @NotEmpty
     @Column(name = "member_id", updatable = false)
     private Long memberId;
 
+    @NotEmpty
     @Column(name = "basket_id", updatable = false)
     private Long basketId;
 
+    @NotEmpty
     @Column(name = "total_price")
     private BigDecimal totalPrice;
 
@@ -36,6 +40,6 @@ public class Orders extends BaseEntity {
     private String requests;
 
     @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
+    private OrdersStatus ordersStatus;
 
 }

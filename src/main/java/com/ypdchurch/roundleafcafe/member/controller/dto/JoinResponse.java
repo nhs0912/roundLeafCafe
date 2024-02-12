@@ -1,14 +1,11 @@
 package com.ypdchurch.roundleafcafe.member.controller.dto;
 
 import com.ypdchurch.roundleafcafe.member.domain.Member;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
 @Builder
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class JoinResponse {
     private Long id;
     private String name;

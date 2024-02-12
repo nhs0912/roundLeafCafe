@@ -1,49 +1,87 @@
-//package com.ypdchurch.roundleafcafe.order.controller;
-//
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.ypdchurch.roundleafcafe.member.controller.dto.JoinRequestDto;
-//import com.ypdchurch.roundleafcafe.order.service.OrderService;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.Mock;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.http.MediaType;
-//import org.springframework.restdocs.RestDocumentationExtension;
-//import org.springframework.test.web.servlet.MockMvc;
-//import org.springframework.test.web.servlet.ResultActions;
-//import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//@ExtendWith({RestDocumentationExtension.class})
-//@AutoConfigureRestDocs(uriScheme = "https", uriHost = "api.roundLeafCafe.com", uriPort = 443)
-//@AutoConfigureMockMvc
-//@SpringBootTest
-//class OrderControllerTest {
-//    @Autowired
-//    private MockMvc mockMvc;
-//
-//    @Mock
-//    private OrderService orderService;
-//
-//    @Test
-//    @DisplayName("주문 성공 테스트")
-//    void orderSuccessTest() throws Exception {
-//        //give
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        String joinRequestJson = objectMapper.writeValueAsString(joinRequestDto);
-//
-//        ResultActions result = mockMvc.perform(post("/api/member/join")
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(joinRequestJson))
-//                .andDo(MockMvcResultHandlers.print());
-//
-//        result.andExpect(status().isCreated())
-//                .andDo(document("{class-name}/{method-name}",
-//                        preprocessRequest(prettyPrint())
-//                        , preprocessResponse(prettyPrint());
-//}
+package com.ypdchurch.roundleafcafe.order.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ypdchurch.roundleafcafe.member.domain.Member;
+import com.ypdchurch.roundleafcafe.member.enums.MemberGrade;
+import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
+import com.ypdchurch.roundleafcafe.member.enums.MemberStatus;
+import com.ypdchurch.roundleafcafe.member.service.MemberService;
+import com.ypdchurch.roundleafcafe.order.controller.dto.OrderMenuRequest;
+import com.ypdchurch.roundleafcafe.order.service.OrdersService;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+
+import java.math.BigDecimal;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@ExtendWith({RestDocumentationExtension.class})
+@AutoConfigureRestDocs(uriScheme = "https", uriHost = "api.roundLeafCafe.com", uriPort = 443)
+@AutoConfigureMockMvc
+@SpringBootTest
+class OrderControllerTest {
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Mock
+    private OrdersService ordersService;
+
+    @Mock
+    private MemberService memberService;
+
+
+    @Test
+    @DisplayName("주문 성공 테스트")
+    void orderSuccessTest() throws Exception {
+        //give
+
+        Member tom = Member.builder()
+                .name("tom")
+                .password("1234")
+                .email("tom@gmail.com")
+                .phoneNumber("01012345678")
+                .grade(MemberGrade.NORMAL)
+                .role(MemberRole.CUSTOMER)
+                .status(MemberStatus.ACTIVE)
+                .build();
+        when(memberService.registerMember(any()))
+                .thenReturn(tom);
+
+        OrderMenuRequest orderMenuRequest = OrderMenuRequest.builder()
+                .memberId(tom.getId())
+                .basketId(1L)
+                .totalPrice(new BigDecimal(2000))
+                .build();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String orderMenuRequestJson = objectMapper.writeValueAsString(orderMenuRequest);
+
+        ResultActions result = mockMvc.perform(post("/api/orders/orderMenu")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(orderMenuRequestJson))
+                .andDo(MockMvcResultHandlers.print());
+
+        result.andExpect(status().isCreated())
+                .andDo(document("{class-name}/{method-name}",
+                        preprocessRequest(prettyPrint())
+                        , preprocessResponse(prettyPrint())
+                ));
+    }
+}
