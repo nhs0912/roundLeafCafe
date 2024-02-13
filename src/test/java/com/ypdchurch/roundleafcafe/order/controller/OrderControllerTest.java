@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -72,6 +74,7 @@ class OrderControllerTest {
                 .basketId(1L)
                 .totalPrice(new BigDecimal(2000))
                 .orderStatus(OrderStatus.ORDER_ACCEPTED)
+                .requests("요청사항이 많습니다!")
                 .build();
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -87,6 +90,21 @@ class OrderControllerTest {
                 .andDo(document("{class-name}/{method-name}",
                         preprocessRequest(prettyPrint())
                         , preprocessResponse(prettyPrint())
+                        , requestFields(
+                                fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("멤버 등록 아이디"),
+                                fieldWithPath("basketId").type(JsonFieldType.NUMBER).description("장바구니 아이디"),
+                                fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("총가격"),
+                                fieldWithPath("requests").type(JsonFieldType.STRING).description("요청사항"),
+                                fieldWithPath("orderStatus").type(JsonFieldType.STRING).description("주문상태")
+
+                        ),responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("주문 아이디"),
+                                fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("멤버 등록 아이디"),
+                                fieldWithPath("basketId").type(JsonFieldType.NUMBER).description("장바구니 아이디"),
+                                fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("총가격"),
+                                fieldWithPath("requests").type(JsonFieldType.STRING).description("요청사항"),
+                                fieldWithPath("orderStatus").type(JsonFieldType.STRING).description("주문상태")
+                        )
                 ));
     }
 }
