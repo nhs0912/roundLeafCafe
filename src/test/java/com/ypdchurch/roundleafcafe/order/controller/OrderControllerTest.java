@@ -80,7 +80,7 @@ class OrderControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         String orderMenuRequestJson = objectMapper.writeValueAsString(orderMenuRequest);
 
-        ResultActions result = mockMvc.perform(post("/api/orders/menu")
+        ResultActions result = mockMvc.perform(post("/api/order/menu")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orderMenuRequestJson))
@@ -94,7 +94,7 @@ class OrderControllerTest {
                                 fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("멤버 등록 아이디"),
                                 fieldWithPath("basketId").type(JsonFieldType.NUMBER).description("장바구니 아이디"),
                                 fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("총가격"),
-                                fieldWithPath("requests").type(JsonFieldType.STRING).description("요청사항"),
+                                fieldWithPath("requests").type(JsonFieldType.STRING).description("요청사항").optional(),
                                 fieldWithPath("orderStatus").type(JsonFieldType.STRING).description("주문상태")
 
                         ),responseFields(

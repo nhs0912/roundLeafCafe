@@ -3,6 +3,7 @@ package com.ypdchurch.roundleafcafe.order.domain;
 import com.ypdchurch.roundleafcafe.common.domain.BaseEntity;
 import com.ypdchurch.roundleafcafe.order.enums.OrderStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -31,6 +32,7 @@ public class Order extends BaseEntity {
     private Long basketId;
 
     @NotNull
+    @Min(value = 0, message = "총 가격은 0원 이상이어야합니다. 입력된 금액 : ${totalPrice}")
     @Column(name = "total_price")
     private BigDecimal totalPrice;
 
