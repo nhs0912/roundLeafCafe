@@ -2,6 +2,8 @@ package com.ypdchurch.roundleafcafe.order.controller.dto;
 
 import com.ypdchurch.roundleafcafe.order.domain.Order;
 import com.ypdchurch.roundleafcafe.order.enums.OrderStatus;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -12,9 +14,13 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @ToString
 public class OrderMenuRequest {
+    @NotNull
     private Long memberId;
+    @NotNull
     private Long basketId;
+    @NotNull
     private BigDecimal totalPrice;
+    @NotEmpty
     private String requests;
     private OrderStatus orderStatus;
 
