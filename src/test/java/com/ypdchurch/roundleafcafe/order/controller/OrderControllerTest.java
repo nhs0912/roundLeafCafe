@@ -32,6 +32,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -96,8 +97,9 @@ class OrderControllerTest {
                                 fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("총가격"),
                                 fieldWithPath("requests").type(JsonFieldType.STRING).description("요청사항").optional(),
                                 fieldWithPath("orderStatus").type(JsonFieldType.STRING).description("주문상태")
+                                        .attributes(key("constraint").value("주문 상태는 처음 접하면"))
 
-                        ),responseFields(
+                        ), responseFields(
                                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("주문 아이디"),
                                 fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("멤버 등록 아이디"),
                                 fieldWithPath("basketId").type(JsonFieldType.NUMBER).description("장바구니 아이디"),

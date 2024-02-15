@@ -1,0 +1,32 @@
+= RoundLeafCafe API Docs
+:doctype: book
+:toc: left
+:source-highlighter: highlightjs
+:setlinks:
+
+= memberController API
+== Member 가입
+
+=== Request
+
+include::{snippets}/member-controller-test/join-success-test/request-fields.adoc[]
+include::{snippets}/member-controller-test/join-success-test/http-request.adoc[]
+
+===  Response
+
+include::{snippets}/member-controller-test/join-success-test/response-fields.adoc[]
+include::{snippets}/member-controller-test/join-success-test/http-response.adoc[]
+
+
+= orderController API
+== Order 주문
+
+=== Request
+
+include::{snippets}/order-controller-test/order-success-test/request-fields.adoc[]
+include::{snippets}/order-controller-test/order-success-test/http-request.adoc[]
+
+===  Response
+
+include::{snippets}/order-controller-test/order-success-test/response-fields.adoc[]
+include::{snippets}/order-controller-test/order-success-test/http-response.adoc[]
