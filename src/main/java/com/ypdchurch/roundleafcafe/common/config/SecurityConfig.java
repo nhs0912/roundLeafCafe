@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,6 +23,7 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 
 @Slf4j
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -44,9 +46,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers(PathRequest.toH2Console()).permitAll();
                     request.requestMatchers(antMatcher("/")).permitAll();
-                    request.requestMatchers(antMatcher("/home")).permitAll();
                     request.requestMatchers(antMatcher("/login")).permitAll();
                     request.requestMatchers(antMatcher("/api/member/**")).permitAll();
+                    request.requestMatchers(antMatcher("/api/order/**")).permitAll();
                     request.requestMatchers(antMatcher("/admin")).hasRole(MemberRole.ADMIN.name());
                     request.requestMatchers(antMatcher("/api/customer/**")).hasRole(MemberRole.CUSTOMER.name());
 

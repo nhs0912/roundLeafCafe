@@ -8,10 +8,11 @@ import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Getter
-@Setter
 @ToString
 @NoArgsConstructor
-public class JoinRequestDto {
+@AllArgsConstructor
+@Builder
+public class JoinRequest {
     private String name;
     private String password;
     private String email;
@@ -19,14 +20,6 @@ public class JoinRequestDto {
     private MemberGrade grade;
     private MemberRole role;
     private MemberStatus status;
-
-    @Builder
-    public JoinRequestDto(String name, String password, String email, String phoneNumber) {
-        this.name = name;
-        this.password = password;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-    }
 
     public Member toEntity(BCryptPasswordEncoder bCryptPasswordEncoder) {
         return Member.builder()
