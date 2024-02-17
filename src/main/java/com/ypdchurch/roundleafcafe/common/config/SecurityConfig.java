@@ -1,5 +1,6 @@
 package com.ypdchurch.roundleafcafe.common.config;
 
+import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtAuthenticationFilter;
 import com.ypdchurch.roundleafcafe.common.util.CustomResponseUtil;
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import lombok.extern.slf4j.Slf4j;
@@ -9,12 +10,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -23,7 +29,7 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 
 @Slf4j
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true) //운영에서는 false로 설정
 public class SecurityConfig {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -33,6 +39,16 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer(){
+        return new WebSecurityCustomizer() {
+            @Override
+            public void customize(WebSecurity web) {
+                web.ignoring().requestMatchers("/favicon.ico", "/error");
+            }
+        };
     }
 
     @Bean
@@ -60,6 +76,12 @@ public class SecurityConfig {
                     log.error("heeseok response = {}", response);
                     CustomResponseUtil.unAuthentication(response, "로그인을 해야합니다.");
                 }))
+                .addFilterBefore(new JwtAuthenticationFilter(new AuthenticationManager() {
+                    @Override
+                    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+                        return null;
+                    }
+                }), UsernamePasswordAuthenticationFilter.class)
 
                 //jSessionId 사용 거부
                 .sessionManagement(sessionManegement
