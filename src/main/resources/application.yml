@@ -1,14 +1,11 @@
 spring:
   profiles:
     active: local
+  config:
+    import: classpath:/application-security.yml
 
 server:
   port: 7777
-
-custom:
-  jwt:
-    #roundLeafCafe_ypdcchurch_2024
-    secretKey: cm91bmRMZWFmQ2FmZV95cGRjY2h1cmNoXzIwMjQK
 
 
 
