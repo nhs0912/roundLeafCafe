@@ -1,0 +1,12 @@
+spring:
+  profiles:
+    active: local
+  config:
+    import: classpath:/application-security.yml
+
+server:
+  port: 7777
+
+
+
+

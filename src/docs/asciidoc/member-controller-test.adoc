@@ -1,0 +1,17 @@
+= memberController API
+:doctype: book
+:toc: left
+:source-highlighter: highlightjs
+:setlinks:
+
+== Member 가입
+
+=== Request
+
+include::{snippets}/member-controller-test/join-success-test/request-fields.adoc[]
+include::{snippets}/member-controller-test/join-success-test/http-request.adoc[]
+
+===  Response
+
+include::{snippets}/member-controller-test/join-success-test/response-fields.adoc[]
+include::{snippets}/member-controller-test/join-success-test/http-response.adoc[]
