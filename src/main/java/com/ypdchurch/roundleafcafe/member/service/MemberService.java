@@ -1,6 +1,7 @@
 package com.ypdchurch.roundleafcafe.member.service;
 
-import com.ypdchurch.roundleafcafe.common.exception.CustomApiException;
+import com.ypdchurch.roundleafcafe.common.exception.MemberCustomException;
+import com.ypdchurch.roundleafcafe.common.exception.MemberErrorCode;
 import com.ypdchurch.roundleafcafe.member.controller.dto.SigninRequest;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.repository.MemberRepository;
@@ -17,11 +18,11 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Member registerMember(Member requestMember) throws CustomApiException {
+    public Member registerMember(Member requestMember) {
 
         // 1. 동일 유저가 있는지 검사
         if (isExistMember(requestMember)) {
-            throw new CustomApiException("등록된 이메일이 존재합니다.");
+            throw new MemberCustomException(MemberErrorCode.ALREADY_EXIST_EMAIL);
         }
         // 2. password encoding
         return memberRepository.save(requestMember);

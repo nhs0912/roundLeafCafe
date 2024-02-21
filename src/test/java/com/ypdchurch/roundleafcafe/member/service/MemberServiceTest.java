@@ -1,6 +1,7 @@
 package com.ypdchurch.roundleafcafe.member.service;
 
-import com.ypdchurch.roundleafcafe.common.exception.CustomApiException;
+import com.ypdchurch.roundleafcafe.common.exception.MemberCustomException;
+import com.ypdchurch.roundleafcafe.common.exception.MemberErrorCode;
 import com.ypdchurch.roundleafcafe.member.controller.dto.JoinRequest;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
@@ -52,8 +53,6 @@ class MemberServiceTest {
                 .email("tom@gmail.com")
                 .phoneNumber("01012345678")
                 .role(MemberRole.CUSTOMER)
-//                .createdAt(LocalDateTime.now())
-//                .modifiedAt(LocalDateTime.now())
                 .build();
 
         when(memberRepository.save(any())).thenReturn(member);
@@ -92,9 +91,11 @@ class MemberServiceTest {
                 memberService.registerMember(requestMember);
             }
         })
-                .isInstanceOf(CustomApiException.class)
-                .hasMessage("등록된 이메일이 존재합니다.");
+                .isInstanceOf(MemberCustomException.class)
+                .hasMessage(MemberErrorCode.ALREADY_EXIST_EMAIL.getMessage());
     }
+
+
 
 
 }
