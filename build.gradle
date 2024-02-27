@@ -82,6 +82,7 @@ ext {
 
 test {
     outputs.dir snippetsDir
+
 }
 
 asciidoctor {

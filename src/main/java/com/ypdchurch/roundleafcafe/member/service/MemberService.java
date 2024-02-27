@@ -31,7 +31,7 @@ public class MemberService {
     @Transactional
     public Long findEmailAndPassword(SigninRequest signinRequest) {
         Member member = memberRepository.findByEmailAndPassword(signinRequest.getEmail(), signinRequest.getPassword())
-                .orElseThrow(() -> new IllegalArgumentException("이메일과 패스워드가 잘못되었습니다."));
+                .orElseThrow(() -> new MemberCustomException(MemberErrorCode.ID_AND_PASSWORD_IS_WRONG));
         return member.getId();
     }
 

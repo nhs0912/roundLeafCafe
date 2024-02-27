@@ -26,6 +26,13 @@ public class MemberController {
         return "join";
     }
 
+    @GetMapping("/tset")
+    public String test() {
+        log.info("test GET METHOD");
+        throw new IllegalArgumentException("그냥 해보았따! ");
+    }
+
+
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/join")
     public JoinResponse join(@RequestBody JoinRequest joinRequest) {
