@@ -6,6 +6,7 @@ import com.ypdchurch.roundleafcafe.member.controller.dto.JoinRequest;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import com.ypdchurch.roundleafcafe.member.repository.MemberRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@Slf4j
 class MemberServiceTest {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -30,6 +32,7 @@ class MemberServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
 
     @Test
     @DisplayName("회원 가입 테스트")
@@ -94,6 +97,5 @@ class MemberServiceTest {
                 .isInstanceOf(MemberCustomException.class)
                 .hasMessage(MemberErrorCode.ALREADY_EXIST_EMAIL.getMessage());
     }
-
 
 }

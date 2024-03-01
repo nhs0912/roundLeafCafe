@@ -33,7 +33,7 @@ public class JwtProvider {
     }
 
     public String createAccessToken(Member member) {
-        log.info("jwtConfig createAccessToken= {}" , jwtConfig);
+        log.info("jwtConfig createAcces sToken= {}", jwtConfig);
         return Jwts.builder()
                 .id(UUID.randomUUID().toString())
                 .header()
@@ -46,6 +46,20 @@ public class JwtProvider {
                 .claim("grade", member.getGrade())
                 .claim("role", member.getRole().name())
                 .claim("status", member.getStatus())
+                .signWith(secretKey)
+                .compact();//just an example id
+    }
+    public String createAccessToken(String email) {
+        log.info("jwtConfig createAcces email Token= {}", jwtConfig);
+        return Jwts.builder()
+                .id(UUID.randomUUID().toString())
+                .header()
+                .type("JWT")
+                .and()
+                .subject(email)
+                .expiration(new Date(System.currentTimeMillis() + ONE_DAY))//a java.util.Date
+                .issuedAt(new Date(System.currentTimeMillis())) // for example, now
+                .claim("email", email)
                 .signWith(secretKey)
                 .compact();//just an example id
     }
@@ -62,7 +76,19 @@ public class JwtProvider {
                 .compact();//just an example id
     }
 
-    public Jws<Claims>  verify(String token) {
+    public String createRefreshToken(String email, String accessToken) {
+        return Jwts.builder()
+                .id(UUID.randomUUID().toString())
+                .subject(email)
+                .expiration(new Date(System.currentTimeMillis() + ONE_DAY))//a java.util.Date
+                .issuedAt(new Date(System.currentTimeMillis())) // for example, now
+                .claim("email", email)
+                .claim("AccessToken", accessToken)
+                .signWith(secretKey)
+                .compact();//just an example id
+    }
+
+    public Jws<Claims> verify(String token) {
         try {
             Jws<Claims> claimsJws = Jwts.parser()
                     .verifyWith(secretKey)
@@ -75,6 +101,18 @@ public class JwtProvider {
         }
     }
 
+    public boolean isValidToken(String token) {
+        try {
+            Jws<Claims> claimsJws = Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token);
+            log.info("claimsJws isValid == {}", claimsJws);
+            return true;
+        } catch (JwtException e) {
+            return false;
+        }
+    }
 
     private SecretKey makeEncryptedSecretKey(String secretKey) {
         log.info("secretKey = {}", secretKey);

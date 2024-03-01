@@ -1,5 +1,6 @@
 package com.ypdchurch.roundleafcafe.member.controller;
 
+import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
 import com.ypdchurch.roundleafcafe.member.controller.dto.JoinRequest;
 import com.ypdchurch.roundleafcafe.member.controller.dto.JoinResponse;
 import com.ypdchurch.roundleafcafe.member.controller.dto.SigninRequest;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final MemberService memberService;
+    private final JwtProvider jwtProvider;
 
     @GetMapping("/join")
     public String join() {
@@ -32,7 +34,6 @@ public class MemberController {
         throw new IllegalArgumentException("그냥 해보았따! ");
     }
 
-
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/join")
     public JoinResponse join(@RequestBody JoinRequest joinRequest) {
@@ -41,16 +42,27 @@ public class MemberController {
         return new JoinResponse(registeredMember);
     }
 
-    @GetMapping("/signin")
-    public String signin() {
-        return "회원가입 page";
-    }
-    @PostMapping("/signin")
+    @PostMapping("/signin2")
+    @ResponseStatus(HttpStatus.OK)
     public SigninResponse signin(@RequestBody SigninRequest signinRequest) {
+        log.info("post signin method start");
         log.info("post signin request = {}", signinRequest);
         Long signinMemberId = memberService.findEmailAndPassword(signinRequest);
-        return SigninResponse.builder()
+
+        Member member = memberService.findById(signinMemberId);
+        String accessToken = jwtProvider.createAccessToken(member);
+        String refreshToken = jwtProvider.createRefreshToken(member, accessToken);
+        log.info("accessToken = {}", accessToken);
+        log.info("refreshToken = {}", refreshToken);
+
+        SigninResponse signinResponse = SigninResponse.builder()
                 .id(signinMemberId)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
+
+        log.info("signinREsponse = {} ", signinResponse);
+
+        return signinResponse;
     }
 }

@@ -1,9 +1,10 @@
 package com.ypdchurch.roundleafcafe.common.auth.jwt.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ypdchurch.roundleafcafe.common.auth.jwt.EmailPassword;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,10 +25,7 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
-        log.info("request = {}", request.toString());
         EmailPassword emailPassword = objectMapper.readValue(request.getInputStream(), EmailPassword.class);
-        log.info("EmailPassword = {}", emailPassword);
-
         UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(
                 emailPassword.getEmail(),
                 emailPassword.getPassword()
@@ -35,4 +33,12 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
         token.setDetails(this.authenticationDetailsSource.buildDetails(request));
         return this.getAuthenticationManager().authenticate(token);
     }
+
+    @Getter
+    @Data
+    public static class EmailPassword {
+        private String email;
+        private String password;
+    }
+
 }

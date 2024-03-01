@@ -25,10 +25,10 @@ public class LoginFailHandler implements AuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
-        log.error("[인증오류] = {} ", MemberErrorCode.ID_AND_PASSWORD_IS_WRONG);
+        log.error("[인증오류] = {} ", MemberErrorCode.ID_AND_PASSWORD_IS_WRONG.getMessage());
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .code(HttpStatus.BAD_REQUEST.toString())
-                .message(MemberErrorCode.ID_AND_PASSWORD_IS_WRONG.toString())
+                .message(MemberErrorCode.ID_AND_PASSWORD_IS_WRONG.getMessage())
                 .build();
 
         response.setContentType(APPLICATION_JSON_VALUE);

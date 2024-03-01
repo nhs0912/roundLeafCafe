@@ -1,8 +1,8 @@
 ### member signin page
-GET http://localhost:7777/api/member/signin
+#GET http://localhdd
 
 ### member signin Post
-POST http://localhost:7777/api/member/signin
+POST localhost:7777/api/member/signin
 Content-Type: application/json
 
 {

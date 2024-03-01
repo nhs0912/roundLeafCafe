@@ -13,6 +13,7 @@ import lombok.*;
 //@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@ToString
 @Entity
 public class Member extends BaseEntity {
 
