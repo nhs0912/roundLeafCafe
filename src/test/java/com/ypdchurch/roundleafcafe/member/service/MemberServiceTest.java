@@ -90,9 +90,9 @@ class MemberServiceTest {
         //then
         assertThatThrownBy(() ->
         {
-            if (requestMember != null) {
-                memberService.registerMember(requestMember);
-            }
+            assert requestMember != null : "requestMember가 null입니다.";
+            memberService.registerMember(requestMember);
+
         })
                 .isInstanceOf(MemberCustomException.class)
                 .hasMessage(MemberErrorCode.ALREADY_EXIST_EMAIL.getMessage());
