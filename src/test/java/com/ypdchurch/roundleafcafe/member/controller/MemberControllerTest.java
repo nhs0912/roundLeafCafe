@@ -1,14 +1,11 @@
 package com.ypdchurch.roundleafcafe.member.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ypdchurch.roundleafcafe.common.exception.MemberCustomException;
-import com.ypdchurch.roundleafcafe.common.exception.MemberErrorCode;
 import com.ypdchurch.roundleafcafe.member.controller.dto.JoinRequest;
 import com.ypdchurch.roundleafcafe.member.enums.MemberGrade;
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import com.ypdchurch.roundleafcafe.member.enums.MemberStatus;
 import com.ypdchurch.roundleafcafe.member.repository.MemberRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

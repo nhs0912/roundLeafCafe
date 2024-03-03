@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
 import com.ypdchurch.roundleafcafe.common.auth.jwt.filter.JwtAuthFilter;
 import com.ypdchurch.roundleafcafe.common.exception.MemberCustomException;
-import com.ypdchurch.roundleafcafe.common.exception.MemberErrorCode;
+import com.ypdchurch.roundleafcafe.common.exception.code.MemberErrorCode;
 import com.ypdchurch.roundleafcafe.common.exception.handler.LoginFailHandler;
 import com.ypdchurch.roundleafcafe.common.exception.handler.LoginSuccessHandler;
 import com.ypdchurch.roundleafcafe.common.util.CustomResponseUtil;

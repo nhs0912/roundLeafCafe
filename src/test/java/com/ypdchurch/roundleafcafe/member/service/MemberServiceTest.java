@@ -1,7 +1,7 @@
 package com.ypdchurch.roundleafcafe.member.service;
 
 import com.ypdchurch.roundleafcafe.common.exception.MemberCustomException;
-import com.ypdchurch.roundleafcafe.common.exception.MemberErrorCode;
+import com.ypdchurch.roundleafcafe.common.exception.code.MemberErrorCode;
 import com.ypdchurch.roundleafcafe.member.controller.dto.JoinRequest;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
@@ -36,19 +36,8 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("회원 가입 테스트")
-    public void registerMemberTest() throws IllegalAccessException {
+    public void registerMemberTest() {
         //given
-        JoinRequest joinRequest = JoinRequest.builder()
-                .name("tom")
-                .password("1234")
-                .email("tom@gmail.com")
-                .phoneNumber("01012345678")
-                .build();
-
-        //stub1
-        when(memberRepository.findByEmail(any())).thenReturn(Optional.empty());
-
-        //stub2
         Member member = Member.builder()
                 .id(1L)
                 .name("tom")
@@ -73,7 +62,7 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("회원 가입 중복체크 테스트 ")
-    public void registerMemberDuplicationCheckTest() throws IllegalAccessException {
+    public void registerMemberDuplicationCheckTest() {
         //given
         JoinRequest joinRequest = JoinRequest.builder()
                 .name("tom")

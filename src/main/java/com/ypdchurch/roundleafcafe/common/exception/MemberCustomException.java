@@ -1,5 +1,6 @@
 package com.ypdchurch.roundleafcafe.common.exception;
 
+import com.ypdchurch.roundleafcafe.common.exception.code.MemberErrorCode;
 import lombok.Getter;
 
 @Getter

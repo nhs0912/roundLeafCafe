@@ -1,7 +1,7 @@
 package com.ypdchurch.roundleafcafe.member.service;
 
 import com.ypdchurch.roundleafcafe.common.exception.MemberCustomException;
-import com.ypdchurch.roundleafcafe.common.exception.MemberErrorCode;
+import com.ypdchurch.roundleafcafe.common.exception.code.MemberErrorCode;
 import com.ypdchurch.roundleafcafe.member.controller.dto.SigninRequest;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.repository.MemberRepository;

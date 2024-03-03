@@ -1,7 +1,7 @@
 package com.ypdchurch.roundleafcafe.common.exception.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ypdchurch.roundleafcafe.common.exception.MemberErrorCode;
+import com.ypdchurch.roundleafcafe.common.exception.code.MemberErrorCode;
 import com.ypdchurch.roundleafcafe.common.exception.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

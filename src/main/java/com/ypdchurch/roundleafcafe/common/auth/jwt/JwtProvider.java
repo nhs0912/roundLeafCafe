@@ -3,6 +3,8 @@ package com.ypdchurch.roundleafcafe.common.auth.jwt;
 
 import com.ypdchurch.roundleafcafe.common.config.JwtConfig;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
+import com.ypdchurch.roundleafcafe.token.domain.Token;
+import com.ypdchurch.roundleafcafe.token.enums.TokenStatus;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -49,6 +51,7 @@ public class JwtProvider {
                 .signWith(secretKey)
                 .compact();//just an example id
     }
+
     public String createAccessToken(String email) {
         log.info("jwtConfig createAcces email Token= {}", jwtConfig);
         return Jwts.builder()
@@ -76,6 +79,24 @@ public class JwtProvider {
                 .compact();//just an example id
     }
 
+    public Token createRefreshToken(Member member) {
+        String refreshToken = Jwts.builder()
+                .id(UUID.randomUUID().toString())
+                .subject(member.getId().toString())
+                .expiration(new Date(System.currentTimeMillis() + ONE_DAY))//a java.util.Date
+                .issuedAt(new Date(System.currentTimeMillis())) // for example, now
+                .claim("email", member.getEmail())
+                .signWith(secretKey)
+                .compact();//just an example id
+
+        return Token.builder()
+                .memberId(member.getId())
+                .refreshToken(refreshToken)
+                .email(member.getEmail())
+                .status(TokenStatus.ACTIVE)
+                .build();
+    }
+
     public String createRefreshToken(String email, String accessToken) {
         return Jwts.builder()
                 .id(UUID.randomUUID().toString())
@@ -90,10 +111,7 @@ public class JwtProvider {
 
     public Jws<Claims> verify(String token) {
         try {
-            Jws<Claims> claimsJws = Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token);
+            Jws<Claims> claimsJws = getClaims(token);
             log.info("claimsJws == {}", claimsJws);
             return claimsJws;
         } catch (JwtException e) {
@@ -103,10 +121,7 @@ public class JwtProvider {
 
     public boolean isValidToken(String token) {
         try {
-            Jws<Claims> claimsJws = Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token);
+            Jws<Claims> claimsJws = getClaims(token);
             log.info("claimsJws isValid == {}", claimsJws);
             return true;
         } catch (JwtException e) {
@@ -114,11 +129,27 @@ public class JwtProvider {
         }
     }
 
+    public String findMemberId(String token) {
+        Jws<Claims> claimsJws = getClaims(token);
+        return claimsJws.getPayload().getSubject();
+    }
+
+    public String findEmail(String token) {
+        Jws<Claims> claimsJws = getClaims(token);
+        return claimsJws.getPayload()
+                .get("email").toString();
+    }
+
+    private Jws<Claims> getClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token);
+    }
+
     private SecretKey makeEncryptedSecretKey(String secretKey) {
-        log.info("secretKey = {}", secretKey);
         String base64SecretKey = Base64.getEncoder()
                 .encodeToString(secretKey.getBytes());
-        log.info("base64SecretKey = {}", base64SecretKey);
         return Keys.hmacShaKeyFor(base64SecretKey.getBytes());
     }
 }
