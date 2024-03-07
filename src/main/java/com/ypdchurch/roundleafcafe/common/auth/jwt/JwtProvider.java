@@ -28,7 +28,6 @@ public class JwtProvider {
     public static final String HEADER = "Authorization";
 
     private final SecretKey secretKey;
-
     public JwtProvider(JwtConfig jwtConfig) {
         this.jwtConfig = jwtConfig;
         secretKey = makeEncryptedSecretKey(jwtConfig.getSecretKey());
@@ -131,7 +130,7 @@ public class JwtProvider {
 
     public String findMemberId(String token) {
         Jws<Claims> claimsJws = getClaims(token);
-        return claimsJws.getPayload().getSubject();
+        return claimsJws.getPayload().get("memberId").toString();
     }
 
     public String findEmail(String token) {

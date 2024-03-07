@@ -41,7 +41,8 @@ public class TokenService {
             throw new TokenCustomException(TokenErrorCode.INVALID_TOKEN);
         }
 
-        Long memberId = Long.valueOf(jwtProvider.findMemberId(token));
+        String memberIdText = jwtProvider.findMemberId(token);
+        Long memberId = Long.valueOf(memberIdText);
         Member foundMember = memberService.findById(memberId);
 
         Token refreshToken = Token.builder()
@@ -50,8 +51,8 @@ public class TokenService {
                 .email(foundMember.getEmail())
                 .status(TokenStatus.ACTIVE)
                 .build();
-
-        return tokenRepository.save(refreshToken);
+        return refreshToken;
+//        return tokenRepository.save(refreshToken);
     }
 
     public Token updateRefreshToken(String token) {
