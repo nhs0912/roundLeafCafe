@@ -35,3 +35,4 @@ logging:
       org.hibernate.type: error
       org.springframework.boot.autoconfigure: error
       org.apache.coyote.http11: debug
+

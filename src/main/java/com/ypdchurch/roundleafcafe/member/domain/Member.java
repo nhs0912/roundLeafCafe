@@ -7,12 +7,13 @@ import com.ypdchurch.roundleafcafe.member.enums.MemberStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
+@Builder
+//@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@ToString
 @Entity
 public class Member extends BaseEntity {
 

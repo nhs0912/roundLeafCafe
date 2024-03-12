@@ -1,49 +1,154 @@
 package com.ypdchurch.roundleafcafe.common.auth.jwt;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.SignatureVerificationException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.DecodedJWT;
+
+import com.ypdchurch.roundleafcafe.common.config.JwtConfig;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
+import com.ypdchurch.roundleafcafe.token.domain.Token;
+import com.ypdchurch.roundleafcafe.token.enums.TokenStatus;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import java.util.Base64;
 import java.util.Date;
+import java.util.UUID;
 
-import static com.auth0.jwt.JWT.require;
-
-
+@Slf4j
 @Component
 public class JwtProvider {
-    private static final String SUBJECT = "roundleafcafe";
+    private final JwtConfig jwtConfig;
     private static final int ONE_DAY = 1000 * 60 * 60 * 24; // 24시간
     private static final int TWO_DAY = 1000 * 60 * 60 * 48; // 48시간
     public static final String TOKEN_PREFIX = "Bearer "; // 스페이스 필요함
     public static final String HEADER = "Authorization";
 
-    public static String createAccessToken(Member member) {
-        String jwt = JWT.create()
-                .withSubject(SUBJECT)
-                .withExpiresAt(new Date(System.currentTimeMillis() + ONE_DAY))
-                .withClaim("id", member.getId())
-                .withClaim("role", member.getRole().name())
-                .sign(Algorithm.HMAC512(JwtVO.SECRET));
-        return TOKEN_PREFIX + jwt;
+    private final SecretKey secretKey;
+    public JwtProvider(JwtConfig jwtConfig) {
+        this.jwtConfig = jwtConfig;
+        secretKey = makeEncryptedSecretKey(jwtConfig.getSecretKey());
     }
 
-    public static String createRefreshToken(Member member, String accessToken) {
-        String jwt = JWT.create()
-                .withSubject(SUBJECT)
-                .withExpiresAt(new Date(System.currentTimeMillis() + TWO_DAY))
-                .withClaim("id", member.getId())
-                .withClaim("AccessToken", accessToken)
-                .sign(Algorithm.HMAC512(JwtVO.SECRET));
-        return TOKEN_PREFIX + jwt;
+    public String createAccessToken(Member member) {
+        log.info("jwtConfig createAcces sToken= {}", jwtConfig);
+        return Jwts.builder()
+                .id(UUID.randomUUID().toString())
+                .header()
+                .type("JWT")
+                .and()
+                .subject(member.getId().toString())
+                .expiration(new Date(System.currentTimeMillis() + ONE_DAY))//a java.util.Date
+                .issuedAt(new Date(System.currentTimeMillis())) // for example, now
+                .claim("email", member.getEmail())
+                .claim("grade", member.getGrade())
+                .claim("role", member.getRole().name())
+                .claim("status", member.getStatus())
+                .signWith(secretKey)
+                .compact();//just an example id
     }
 
-    public static DecodedJWT verify(String jwt) throws SignatureVerificationException, TokenExpiredException {
-        DecodedJWT decodedJWT = require(Algorithm.HMAC512(JwtVO.SECRET))
-                .build().verify(jwt);
-        return decodedJWT;
+    public String createAccessToken(String email) {
+        log.info("jwtConfig createAcces email Token= {}", jwtConfig);
+        return Jwts.builder()
+                .id(UUID.randomUUID().toString())
+                .header()
+                .type("JWT")
+                .and()
+                .subject(email)
+                .expiration(new Date(System.currentTimeMillis() + ONE_DAY))//a java.util.Date
+                .issuedAt(new Date(System.currentTimeMillis())) // for example, now
+                .claim("email", email)
+                .signWith(secretKey)
+                .compact();//just an example id
+    }
+
+    public String createRefreshToken(Member member, String accessToken) {
+        return Jwts.builder()
+                .id(UUID.randomUUID().toString())
+                .subject(member.getId().toString())
+                .expiration(new Date(System.currentTimeMillis() + ONE_DAY))//a java.util.Date
+                .issuedAt(new Date(System.currentTimeMillis())) // for example, now
+                .claim("email", member.getEmail())
+                .claim("AccessToken", accessToken)
+                .signWith(secretKey)
+                .compact();//just an example id
+    }
+
+    public Token createRefreshToken(Member member) {
+        String refreshToken = Jwts.builder()
+                .id(UUID.randomUUID().toString())
+                .subject(member.getId().toString())
+                .expiration(new Date(System.currentTimeMillis() + ONE_DAY))//a java.util.Date
+                .issuedAt(new Date(System.currentTimeMillis())) // for example, now
+                .claim("email", member.getEmail())
+                .signWith(secretKey)
+                .compact();//just an example id
+
+        return Token.builder()
+                .memberId(member.getId())
+                .refreshToken(refreshToken)
+                .email(member.getEmail())
+                .status(TokenStatus.ACTIVE)
+                .build();
+    }
+
+    public String createRefreshToken(String email, String accessToken) {
+        return Jwts.builder()
+                .id(UUID.randomUUID().toString())
+                .subject(email)
+                .expiration(new Date(System.currentTimeMillis() + ONE_DAY))//a java.util.Date
+                .issuedAt(new Date(System.currentTimeMillis())) // for example, now
+                .claim("email", email)
+                .claim("AccessToken", accessToken)
+                .signWith(secretKey)
+                .compact();//just an example id
+    }
+
+    public Jws<Claims> verify(String token) {
+        try {
+            Jws<Claims> claimsJws = getClaims(token);
+            log.info("claimsJws == {}", claimsJws);
+            return claimsJws;
+        } catch (JwtException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public boolean isValidToken(String token) {
+        try {
+            Jws<Claims> claimsJws = getClaims(token);
+            log.info("claimsJws isValid == {}", claimsJws);
+            return true;
+        } catch (JwtException e) {
+            return false;
+        }
+    }
+
+    public String findMemberId(String token) {
+        Jws<Claims> claimsJws = getClaims(token);
+        return claimsJws.getPayload().get("memberId").toString();
+    }
+
+    public String findEmail(String token) {
+        Jws<Claims> claimsJws = getClaims(token);
+        return claimsJws.getPayload()
+                .get("email").toString();
+    }
+
+    private Jws<Claims> getClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token);
+    }
+
+    private SecretKey makeEncryptedSecretKey(String secretKey) {
+        String base64SecretKey = Base64.getEncoder()
+                .encodeToString(secretKey.getBytes());
+        return Keys.hmacShaKeyFor(base64SecretKey.getBytes());
     }
 }

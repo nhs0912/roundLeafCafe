@@ -20,3 +20,7 @@ gradle-app.setting
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 out/
+
+.idea/gradle.xml
+.idea/misc.xml
+

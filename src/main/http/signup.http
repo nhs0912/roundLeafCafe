@@ -1,0 +1,15 @@
+### member signup page
+GET http://localhost:7777/api/member/join
+
+### member signup Post
+POST localhost:7777/api/member/join
+Content-Type: application/json
+
+{
+  "email" : "nhs0912@nate.com",
+  "password" : "1234",
+  "name": "노희석",
+  "phoneNumber": "01011234453",
+  "grade": "NORMAL",
+  "role": "ADMIN"
+}

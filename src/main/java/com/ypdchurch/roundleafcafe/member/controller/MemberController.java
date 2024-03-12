@@ -1,7 +1,10 @@
 package com.ypdchurch.roundleafcafe.member.controller;
 
+import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
 import com.ypdchurch.roundleafcafe.member.controller.dto.JoinRequest;
 import com.ypdchurch.roundleafcafe.member.controller.dto.JoinResponse;
+import com.ypdchurch.roundleafcafe.member.controller.dto.SigninRequest;
+import com.ypdchurch.roundleafcafe.member.controller.dto.SigninResponse;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +30,6 @@ public class MemberController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/join")
     public JoinResponse join(@RequestBody JoinRequest joinRequest) {
-
         log.info("heeseok join.joinRequestDto = {} ", joinRequest);
         Member registeredMember = memberService.registerMember(joinRequest.toEntity(passwordEncoder));
         return new JoinResponse(registeredMember);
