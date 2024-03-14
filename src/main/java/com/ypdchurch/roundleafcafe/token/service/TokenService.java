@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -37,22 +39,21 @@ public class TokenService {
     }
 
     public Token registerRefreshToken(String token) {
-        if (!jwtProvider.isValidToken(token)) {
-            throw new TokenCustomException(TokenErrorCode.INVALID_TOKEN);
-        }
-
-        String memberIdText = jwtProvider.findMemberId(token);
-        Long memberId = Long.valueOf(memberIdText);
-        Member foundMember = memberService.findById(memberId);
-
-        Token refreshToken = Token.builder()
-                .refreshToken(token)
-                .memberId(memberId)
-                .email(foundMember.getEmail())
-                .status(TokenStatus.ACTIVE)
-                .build();
-        return refreshToken;
-//        return tokenRepository.save(refreshToken);
+        return processToken(token, block -> {
+            Optional<String> memberIdText = jwtProvider.findMemberId(token);
+            if (memberIdText.isPresent()) {
+                Long memberId = Long.valueOf(memberIdText.get());
+                Member foundMember = memberService.findById(memberId);
+                Token refreshToken = Token.builder()
+                        .refreshToken(token)
+                        .memberId(memberId)
+                        .email(foundMember.getEmail())
+                        .status(TokenStatus.ACTIVE)
+                        .build();
+                return tokenRepository.save(refreshToken);
+            }
+            return null;
+        });
     }
 
     public Token updateRefreshToken(String token) {
@@ -62,6 +63,13 @@ public class TokenService {
 
         Token refreshToken = findByRefreshToken(token);
         return refreshToken.updateRefreshToken(token);
+    }
+
+    public Token processToken(String token, ProcessTokenProcess block) {
+        if (!jwtProvider.isValidToken(token)) {
+            throw new TokenCustomException(TokenErrorCode.INVALID_TOKEN);
+        }
+        return block.process(token);
     }
 
     public void deleteByRefreshToken(String token) {
@@ -79,5 +87,7 @@ public class TokenService {
         this.deleteByRefreshToken(refreshToken.getRefreshToken());
     }
 
-
+    private interface ProcessTokenProcess {
+        abstract Token process(String token);
+    }
 }

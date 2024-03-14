@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -128,9 +129,9 @@ public class JwtProvider {
         }
     }
 
-    public String findMemberId(String token) {
+    public Optional<String> findMemberId(String token) {
         Jws<Claims> claimsJws = getClaims(token);
-        return claimsJws.getPayload().get("memberId").toString();
+        return Optional.ofNullable(claimsJws.getPayload().get("memberId").toString());
     }
 
     public String findEmail(String token) {

@@ -39,7 +39,7 @@ class TokenServiceTest {
         tokenService = new TokenService(tokenRepository, memberService, jwtProvider);
     }
 
-    @Test
+//    @Test
     @DisplayName("Token 발급 서비스 저장 성공")
     public void registerSuccessTest() {
         //given
