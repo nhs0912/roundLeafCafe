@@ -38,6 +38,10 @@ public class MemberService {
         return member.getId();
     }
 
+    public void deleteAll() {
+        memberRepository.deleteAll();
+    }
+
     public Member findById(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(MemberService::get);

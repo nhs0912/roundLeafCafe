@@ -1,18 +1,27 @@
 package com.ypdchurch.roundleafcafe.member.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ypdchurch.roundleafcafe.common.exception.MemberCustomException;
+import com.ypdchurch.roundleafcafe.common.exception.code.MemberErrorCode;
 import com.ypdchurch.roundleafcafe.member.controller.dto.JoinRequest;
+import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.enums.MemberGrade;
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import com.ypdchurch.roundleafcafe.member.enums.MemberStatus;
 import com.ypdchurch.roundleafcafe.member.repository.MemberRepository;
+import com.ypdchurch.roundleafcafe.member.service.MemberService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,6 +29,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -38,11 +49,11 @@ class MemberControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private MemberService memberService;
 
     @BeforeEach
     public void deleteAll() {
-        memberRepository.deleteAll();
+        memberService.deleteAll();
     }
 
     @Test
@@ -89,7 +100,7 @@ class MemberControllerTest {
                                 fieldWithPath("phoneNumber").type(JsonFieldType.STRING).description("핸드폰번호"),
                                 fieldWithPath("grade").type(JsonFieldType.STRING).description("등급"),
                                 fieldWithPath("role").type(JsonFieldType.STRING).description("역할"),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description("상태")
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("상태").description("기본: 정상")
                         ), responseFields(
                                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("id"),
                                 fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
@@ -113,9 +124,11 @@ class MemberControllerTest {
                 .status(MemberStatus.ACTIVE)
                 .build();
 
-        memberRepository.save(joinRequest.toEntity(passwordEncoder));
-        ObjectMapper objectMapper = new ObjectMapper();
+        Member inputMember = joinRequest.toEntity(passwordEncoder);
+        memberService.registerMember(inputMember);
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        //when
         JoinRequest joinAnotherRequest = JoinRequest.builder()
                 .name("Jane")
                 .password("12345")
@@ -127,30 +140,26 @@ class MemberControllerTest {
                 .build();
         String joinAnotherRequestJson = objectMapper.writeValueAsString(joinAnotherRequest);
 
-
+        //then
         ResultActions anotherResult = mockMvc.perform(post("/api/member/join")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(joinAnotherRequestJson))
                 .andExpect(status().is4xxClientError());
 
-//        anotherResult.andExpect(status().is4xxClientError())
-//                .andDo(document("{class-name}/{method-name}",
-//                        preprocessRequest(prettyPrint())
-//                        , preprocessResponse(prettyPrint())
-//                        , requestFields(
-//                                fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
-//                                fieldWithPath("password").type(JsonFieldType.STRING).description("password"),
-//                                fieldWithPath("email").type(JsonFieldType.STRING).description("email"),
-//                                fieldWithPath("phoneNumber").type(JsonFieldType.STRING).description("핸드폰번호"),
-//                                fieldWithPath("grade").type(JsonFieldType.STRING).description("등급"),
-//                                fieldWithPath("role").type(JsonFieldType.STRING).description("역할"),
-//                                fieldWithPath("status").type(JsonFieldType.STRING).description("상태")
-//                        ), responseFields(
-//                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("id"),
-//                                fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
-//                                fieldWithPath("email").type(JsonFieldType.STRING).description("email")
-//                        )
-//                ));
+        anotherResult.andExpect(status().is4xxClientError())
+                .andDo(document("{class-name}/{method-name}",
+                        preprocessRequest(prettyPrint())
+                        , preprocessResponse(prettyPrint())
+                        , requestFields(
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
+                                fieldWithPath("password").type(JsonFieldType.STRING).description("password"),
+                                fieldWithPath("email").type(JsonFieldType.STRING).description("email"),
+                                fieldWithPath("phoneNumber").type(JsonFieldType.STRING).description("핸드폰번호"),
+                                fieldWithPath("grade").type(JsonFieldType.STRING).description("등급"),
+                                fieldWithPath("role").type(JsonFieldType.STRING).description("역할"),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("상태")
+                        )
+                ));
     }
 }
