@@ -2,17 +2,15 @@ package com.ypdchurch.roundleafcafe.common.exception.handler;
 
 import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
 import com.ypdchurch.roundleafcafe.common.config.MemberPrincipal;
+import com.ypdchurch.roundleafcafe.token.domain.AuthenticationTokens;
+import com.ypdchurch.roundleafcafe.token.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-
-import java.util.Collection;
-import java.util.Iterator;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -22,6 +20,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtProvider jwtProvider;
+    private final TokenService tokenService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -29,17 +28,18 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
                                         Authentication authentication) {
         MemberPrincipal principal = (MemberPrincipal) authentication.getPrincipal();
         log.info("[인증성공] user={}, password = {}", principal.getUsername(), principal.getPassword());
-        String accessToken = jwtProvider.createAccessToken(principal.getUsername());
-        String refreshToken = jwtProvider.createRefreshToken(principal.getUsername(), accessToken);
+        AuthenticationTokens tokens = tokenService.getAuthenticationTokens(principal.getUsername());
+        tokenService.registerRefreshToken(tokens.getRefreshToken());
 
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-        GrantedAuthority auth = iterator.next();
-        String role = auth.getAuthority();
-        log.info("[인증성공3] role = {}", role);
+        setupLoginSuccessResponse(response, AuthenticationTokens.builder()
+                .accessToken(tokens.getAccessToken())
+                .refreshToken(tokens.getRefreshToken())
+                .build());
+    }
 
-        response.addHeader(HttpHeaders.AUTHORIZATION, JwtProvider.TOKEN_PREFIX + accessToken);
-        response.addHeader("refreshToken", JwtProvider.TOKEN_PREFIX + refreshToken);
+    private void setupLoginSuccessResponse(HttpServletResponse response, AuthenticationTokens tokens) {
+        response.addHeader(HttpHeaders.AUTHORIZATION, JwtProvider.TOKEN_PREFIX + tokens.getAccessToken());
+        response.addHeader("refreshToken", JwtProvider.TOKEN_PREFIX + tokens.getRefreshToken());
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(UTF_8.name());
         response.setStatus(SC_OK);

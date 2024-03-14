@@ -20,6 +20,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -53,8 +56,11 @@ class OrderControllerTest {
 
     @Test
     @DisplayName("주문 성공 테스트")
+    @WithMockUser(value = "tom", username = "tom", password = "1234")
     void orderSuccessTest() throws Exception {
         //give
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        securityContext.getAuthentication();
 
         Member tom = Member.builder()
                 .name("tom")
@@ -75,7 +81,7 @@ class OrderControllerTest {
                 .basketId(1L)
                 .totalPrice(new BigDecimal(2000))
                 .orderStatus(OrderStatus.ORDER_ACCEPTED)
-                .requests("요청사항이 많습니다!")
+                .requests("반찬 많이 주세요! ")
                 .build();
 
         ObjectMapper objectMapper = new ObjectMapper();

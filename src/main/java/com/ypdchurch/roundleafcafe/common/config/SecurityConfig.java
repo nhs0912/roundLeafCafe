@@ -10,6 +10,7 @@ import com.ypdchurch.roundleafcafe.common.exception.handler.LoginSuccessHandler;
 import com.ypdchurch.roundleafcafe.common.util.CustomResponseUtil;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.repository.MemberRepository;
+import com.ypdchurch.roundleafcafe.token.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -45,6 +46,7 @@ public class SecurityConfig {
     private final MemberRepository memberRepository;
     private final ObjectMapper objectMapper;
     private final JwtProvider jwtProvider;
+    private final TokenService tokenService;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -74,7 +76,7 @@ public class SecurityConfig {
                     request.requestMatchers(antMatcher("/")).permitAll();
                     request.requestMatchers(antMatcher("/api/member/join")).permitAll();
                     request.requestMatchers(antMatcher("/api/member/signin")).permitAll();
-                    request.requestMatchers(antMatcher("/api/order/**")).permitAll();
+//                    request.requestMatchers(antMatcher("/api/order/**")).permitAll();
 //                    request.requestMatchers(antMatcher("/admin")).hasRole(MemberRole.ADMIN.name());
 //                    request.requestMatchers(antMatcher("/api/customer/**"));
 
@@ -98,7 +100,7 @@ public class SecurityConfig {
     public JwtAuthFilter MemberEmailPasswordFilter() {
         JwtAuthFilter jwtAuthFilter = new JwtAuthFilter("/api/member/signin", objectMapper);
         jwtAuthFilter.setAuthenticationManager(authenticationManager());
-        jwtAuthFilter.setAuthenticationSuccessHandler(new LoginSuccessHandler(jwtProvider));
+        jwtAuthFilter.setAuthenticationSuccessHandler(new LoginSuccessHandler(jwtProvider, tokenService));
         jwtAuthFilter.setAuthenticationFailureHandler(new LoginFailHandler(objectMapper));
         jwtAuthFilter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
 

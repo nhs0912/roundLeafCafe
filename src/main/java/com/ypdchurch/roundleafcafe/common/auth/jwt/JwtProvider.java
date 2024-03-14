@@ -10,6 +10,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -21,17 +22,18 @@ import java.util.UUID;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtProvider {
-    private final JwtConfig jwtConfig;
     private static final int ONE_DAY = 1000 * 60 * 60 * 24; // 24시간
     private static final int TWO_DAY = 1000 * 60 * 60 * 48; // 48시간
     public static final String TOKEN_PREFIX = "Bearer "; // 스페이스 필요함
-    public static final String HEADER = "Authorization";
 
+    private final JwtConfig jwtConfig;
     private final SecretKey secretKey;
+
     public JwtProvider(JwtConfig jwtConfig) {
         this.jwtConfig = jwtConfig;
-        secretKey = makeEncryptedSecretKey(jwtConfig.getSecretKey());
+        this.secretKey = makeEncryptedSecretKey(jwtConfig.getSecretKey());
     }
 
     public String createAccessToken(Member member) {
@@ -71,7 +73,7 @@ public class JwtProvider {
         return Jwts.builder()
                 .id(UUID.randomUUID().toString())
                 .subject(member.getId().toString())
-                .expiration(new Date(System.currentTimeMillis() + ONE_DAY))//a java.util.Date
+                .expiration(new Date(System.currentTimeMillis() + TWO_DAY))//a java.util.Date
                 .issuedAt(new Date(System.currentTimeMillis())) // for example, now
                 .claim("email", member.getEmail())
                 .claim("AccessToken", accessToken)
@@ -83,9 +85,10 @@ public class JwtProvider {
         String refreshToken = Jwts.builder()
                 .id(UUID.randomUUID().toString())
                 .subject(member.getId().toString())
-                .expiration(new Date(System.currentTimeMillis() + ONE_DAY))//a java.util.Date
+                .expiration(new Date(System.currentTimeMillis() + TWO_DAY))//a java.util.Date
                 .issuedAt(new Date(System.currentTimeMillis())) // for example, now
                 .claim("email", member.getEmail())
+                .claim("memberId", member.getId())
                 .signWith(secretKey)
                 .compact();//just an example id
 

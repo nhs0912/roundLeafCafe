@@ -1,6 +1,7 @@
 package com.ypdchurch.roundleafcafe.token.service;
 
 import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
+import com.ypdchurch.roundleafcafe.common.config.JwtConfig;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.repository.MemberRepository;
 import com.ypdchurch.roundleafcafe.member.service.MemberService;
@@ -15,56 +16,46 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 class TokenServiceTest {
-    @Mock
+    @InjectMocks
     private TokenService tokenService;
     @Mock
     private TokenRepository tokenRepository;
     @Mock
+    private MemberRepository memberRepository;
+    @Mock
     private JwtProvider jwtProvider;
     @InjectMocks
     private MemberService memberService;
-    @Mock
-    private MemberRepository memberRepository;
-    @Mock
-    private Member member;
 
     @BeforeEach
     public void setUp() {
+        final String secretKey = "testBase64TokenService";
+        when(new JwtConfig().getSecretKey()).thenReturn(secretKey);
+        jwtProvider = new JwtProvider(new JwtConfig());
         tokenService = new TokenService(tokenRepository, memberService, jwtProvider);
     }
 
-//    @Test
+    @Test
     @DisplayName("Token 발급 서비스 저장 성공")
     public void registerSuccessTest() {
         //given
-        String refreshToken = "refreshTokenText";
-
-//        Member member = Member.builder()
-//                .id(1L)
-//                .email("tom@gmail.com")
-//                .build();
-
-//        when(jwtProvider.isValidToken(any())).thenReturn(true);
-//        when(jwtProvider.findMemberId(any())).thenReturn("1");
-//        when(memberRepository.findById(any())).thenReturn(Optional.of(member));
-//        when(tokenRepository.save(any())).thenReturn(refreshToken);
-
-        Token token = Token.builder()
-                .refreshToken(refreshToken)
-                .memberId(1L)
-                .email(member.getEmail())
+        Member member = Member.builder()
+                .id(1L)
+                .email("tom@gmail.com")
                 .build();
-        when(tokenRepository.save(any())).thenReturn(token);
-        Token registeredRefreshToken = tokenService.registerRefreshToken(refreshToken);
-        System.out.println(registeredRefreshToken);
+        Token refreshToken = jwtProvider.createRefreshToken(member);
 
-        //then
-//        assertThat(token.getRefreshToken()).isEqualTo(refreshToken);
+        when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
+        tokenService.registerRefreshToken(refreshToken.getRefreshToken());
+
+        assertThat(refreshToken.getEmail()).isEqualTo("tom@gmail.com");
     }
 }

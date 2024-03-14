@@ -5,6 +5,7 @@ import com.ypdchurch.roundleafcafe.common.exception.TokenCustomException;
 import com.ypdchurch.roundleafcafe.common.exception.code.TokenErrorCode;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.service.MemberService;
+import com.ypdchurch.roundleafcafe.token.domain.AuthenticationTokens;
 import com.ypdchurch.roundleafcafe.token.domain.Token;
 import com.ypdchurch.roundleafcafe.token.enums.TokenStatus;
 import com.ypdchurch.roundleafcafe.token.repository.TokenRepository;
@@ -39,22 +40,39 @@ public class TokenService {
     }
 
     public Token registerRefreshToken(String token) {
-        return processToken(token, block -> {
-            Optional<String> memberIdText = jwtProvider.findMemberId(token);
-            if (memberIdText.isPresent()) {
-                Long memberId = Long.valueOf(memberIdText.get());
-                Member foundMember = memberService.findById(memberId);
-                Token refreshToken = Token.builder()
-                        .refreshToken(token)
-                        .memberId(memberId)
-                        .email(foundMember.getEmail())
-                        .status(TokenStatus.ACTIVE)
-                        .build();
-                return tokenRepository.save(refreshToken);
-            }
+
+        Optional<String> memberIdText = jwtProvider.findMemberId(token);
+        if (!memberIdText.isPresent()) {
             return null;
-        });
+        }
+        Long memberId = Long.valueOf(memberIdText.get());
+        Member foundMember = memberService.findById(memberId);
+        Token refreshToken = Token.builder()
+                .refreshToken(token)
+                .memberId(memberId)
+                .email(foundMember.getEmail())
+                .status(TokenStatus.ACTIVE)
+                .build();
+        return tokenRepository.save(refreshToken);
     }
+
+//    public Token registerRefreshToken(String token) {
+//        return processToken(token, block -> {
+//            Optional<String> memberIdText = jwtProvider.findMemberId(token);
+//            if (memberIdText.isPresent()) {
+//                Long memberId = Long.valueOf(memberIdText.get());
+//                Member foundMember = memberService.findById(memberId);
+//                Token refreshToken = Token.builder()
+//                        .refreshToken(token)
+//                        .memberId(memberId)
+//                        .email(foundMember.getEmail())
+//                        .status(TokenStatus.ACTIVE)
+//                        .build();
+//                return tokenRepository.save(refreshToken);
+//            }
+//            return null;
+//        });
+//    }
 
     public Token updateRefreshToken(String token) {
         if (!jwtProvider.isValidToken(token)) {
@@ -65,11 +83,20 @@ public class TokenService {
         return refreshToken.updateRefreshToken(token);
     }
 
-    public Token processToken(String token, ProcessTokenProcess block) {
-        if (!jwtProvider.isValidToken(token)) {
-            throw new TokenCustomException(TokenErrorCode.INVALID_TOKEN);
-        }
-        return block.process(token);
+//    public Token processToken(String token, ProcessTokenProcess block) {
+//        if (!jwtProvider.isValidToken(token)) {
+//            throw new TokenCustomException(TokenErrorCode.INVALID_TOKEN);
+//        }
+//        return block.process(token);
+//    }
+
+    public AuthenticationTokens getAuthenticationTokens(String email) {
+        String accessToken = jwtProvider.createAccessToken(email);
+        String refreshToken = jwtProvider.createRefreshToken(email, accessToken);
+        return AuthenticationTokens.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     public void deleteByRefreshToken(String token) {
