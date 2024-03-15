@@ -1,8 +1,8 @@
 ### member signup page
-GET http://localhost:7777/api/member/join
+GET {{url}}/api/member/join
 
 ### member signup Post
-POST localhost:7777/api/member/join
+POST {{url}}/api/member/join
 Content-Type: application/json
 
 {

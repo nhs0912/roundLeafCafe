@@ -1,8 +1,7 @@
 ### member signin page
-#GET http://localhdd
 
 ### member signin Sucess test
-POST localhost:7777/api/member/signin
+POST {{url}}/api/member/signin
 Content-Type: application/json
 
 {
@@ -11,7 +10,7 @@ Content-Type: application/json
 }
 
 ### member signin Fail test
-POST localhost:7777/api/member/signin
+POST {{url}}/api/member/signin
 Content-Type: application/json
 
 {
