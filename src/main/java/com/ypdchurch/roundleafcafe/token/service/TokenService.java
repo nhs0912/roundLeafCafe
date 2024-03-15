@@ -3,6 +3,7 @@ package com.ypdchurch.roundleafcafe.token.service;
 import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
 import com.ypdchurch.roundleafcafe.common.exception.TokenCustomException;
 import com.ypdchurch.roundleafcafe.common.exception.code.TokenErrorCode;
+import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.service.MemberService;
 import com.ypdchurch.roundleafcafe.token.domain.AuthenticationTokens;
 import com.ypdchurch.roundleafcafe.token.domain.Token;
@@ -40,10 +41,10 @@ public class TokenService {
 
         String memberEmailText = jwtProvider.findEmail(token);
 
-        Long memberId = memberService.findByEmail(memberEmailText);
+        Member member = memberService.findByEmail(memberEmailText);
         Token refreshToken = Token.builder()
                 .refreshToken(token)
-                .memberId(memberId)
+                .memberId(member.getId())
                 .email(memberEmailText)
                 .status(TokenStatus.ACTIVE)
                 .build();

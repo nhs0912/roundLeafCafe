@@ -38,11 +38,9 @@ public class MemberService {
         return member.getId();
     }
 
-    public Long findByEmail(String email) {
-        Member member = memberRepository.findByEmail(email)
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberCustomException(MemberErrorCode.MEMBER_NOT_FOUND.getMessage()));
-
-        return member.getId();
     }
 
     public void deleteAll() {

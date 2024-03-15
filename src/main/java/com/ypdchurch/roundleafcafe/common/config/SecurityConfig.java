@@ -76,7 +76,7 @@ public class SecurityConfig {
                     request.requestMatchers(antMatcher("/")).permitAll();
                     request.requestMatchers(antMatcher("/api/member/join")).permitAll();
                     request.requestMatchers(antMatcher("/api/member/signin")).permitAll();
-//                    request.requestMatchers(antMatcher("/api/order/**")).permitAll();
+                    request.requestMatchers(antMatcher("/api/order/**")).permitAll();
 //                    request.requestMatchers(antMatcher("/admin")).hasRole(MemberRole.ADMIN.name());
 //                    request.requestMatchers(antMatcher("/api/customer/**"));
 

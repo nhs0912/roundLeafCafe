@@ -5,11 +5,14 @@ import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.repository.MemberRepository;
 import com.ypdchurch.roundleafcafe.member.service.MemberService;
 import com.ypdchurch.roundleafcafe.token.domain.Token;
+import com.ypdchurch.roundleafcafe.token.repository.TokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -21,18 +24,21 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @Slf4j
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class TokenServiceTest {
-    @Autowired
+    @InjectMocks
     private TokenService tokenService;
 
-    @InjectMocks
+    @Mock
+    private TokenRepository tokenRepository;
+
+    @Mock
     private MemberService memberService;
 
     @Mock
     private MemberRepository memberRepository;
 
-    @Autowired
+    @Mock
     private JwtProvider jwtProvider;
 
     @Test
@@ -43,15 +49,16 @@ class TokenServiceTest {
                 .id(1L)
                 .email("tom@gmail.com")
                 .build();
-        String refreshToken = jwtProvider.createRefreshToken(member.getEmail());
+        String tokenText = "refreshToken123456789";
+        //when
+        when(memberService.findByEmail(any())).thenReturn(member);
+        when(tokenRepository.save(any())).thenReturn(Token.builder()
+                .refreshToken(tokenText)
+                .email("tom@gmail.com")
+                .build());
 
-
-        when(memberRepository.findByEmail(any())).thenReturn(Optional.of(member));
-//doReturn(model).when(this.modelRepository).save(model);
-        doReturn(member.getId()).when(memberService.findByEmail(any()));
-        when(memberService.findById(any())).thenReturn(member);
-        Token token = tokenService.registerRefreshToken(refreshToken);
-
-        assertThat(token.getEmail()).isEqualTo("tom@gmail.com");
+        Token registeredRefreshToken = tokenService.registerRefreshToken(tokenText);
+        //then
+        assertThat(registeredRefreshToken.getEmail()).isEqualTo("tom@gmail.com");
     }
 }
