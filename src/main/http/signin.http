@@ -1,11 +1,20 @@
 ### member signin page
 #GET http://localhdd
 
-### member signin Post
+### member signin Sucess test
 POST localhost:7777/api/member/signin
 Content-Type: application/json
 
 {
   "email" : "nhs0912@nate.com",
   "password" : "1234"
+}
+
+### member signin Fail test
+POST localhost:7777/api/member/signin
+Content-Type: application/json
+
+{
+"email" : "nhs0912@nate.com",
+"password" : "12345"
 }
