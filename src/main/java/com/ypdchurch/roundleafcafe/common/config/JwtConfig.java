@@ -1,14 +1,16 @@
 package com.ypdchurch.roundleafcafe.common.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 
 @Getter
 @Configuration
+@Builder
+@AllArgsConstructor
 public class JwtConfig {
-    @Value("${custom.jwt.secretKey}")
-    private String secretKey;
+
 
 }

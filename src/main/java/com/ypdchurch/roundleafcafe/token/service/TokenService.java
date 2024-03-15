@@ -3,7 +3,6 @@ package com.ypdchurch.roundleafcafe.token.service;
 import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
 import com.ypdchurch.roundleafcafe.common.exception.TokenCustomException;
 import com.ypdchurch.roundleafcafe.common.exception.code.TokenErrorCode;
-import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.service.MemberService;
 import com.ypdchurch.roundleafcafe.token.domain.AuthenticationTokens;
 import com.ypdchurch.roundleafcafe.token.domain.Token;
@@ -12,8 +11,6 @@ import com.ypdchurch.roundleafcafe.token.repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,16 +38,13 @@ public class TokenService {
 
     public Token registerRefreshToken(String token) {
 
-        Optional<String> memberIdText = jwtProvider.findMemberId(token);
-        if (!memberIdText.isPresent()) {
-            return null;
-        }
-        Long memberId = Long.valueOf(memberIdText.get());
-        Member foundMember = memberService.findById(memberId);
+        String memberEmailText = jwtProvider.findEmail(token);
+
+        Long memberId = memberService.findByEmail(memberEmailText);
         Token refreshToken = Token.builder()
                 .refreshToken(token)
                 .memberId(memberId)
-                .email(foundMember.getEmail())
+                .email(memberEmailText)
                 .status(TokenStatus.ACTIVE)
                 .build();
         return tokenRepository.save(refreshToken);
@@ -91,10 +85,8 @@ public class TokenService {
 //    }
 
     public AuthenticationTokens getAuthenticationTokens(String email) {
-        String accessToken = jwtProvider.createAccessToken(email);
-        String refreshToken = jwtProvider.createRefreshToken(email, accessToken);
+        String refreshToken = jwtProvider.createRefreshToken(email);
         return AuthenticationTokens.builder()
-                .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
     }
