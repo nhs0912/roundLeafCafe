@@ -72,11 +72,6 @@ public class JwtProvider {
         }
     }
 
-//    public Optional<String> findMemberId(String token) {
-//        Jws<Claims> claimsJws = getClaims(token);
-//        return Optional.ofNullable(claimsJws.getPayload().get("memberId").toString());
-//    }
-
     public String findEmail(String token) {
         Jws<Claims> claimsJws = getClaims(token);
         return claimsJws.getPayload()
