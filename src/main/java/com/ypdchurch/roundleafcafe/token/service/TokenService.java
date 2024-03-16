@@ -87,7 +87,9 @@ public class TokenService {
 
     public AuthenticationTokens getAuthenticationTokens(String email) {
         String refreshToken = jwtProvider.createRefreshToken(email);
+        String accessToken = jwtProvider.createAccessToken(email);
         return AuthenticationTokens.builder()
+                .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
     }
