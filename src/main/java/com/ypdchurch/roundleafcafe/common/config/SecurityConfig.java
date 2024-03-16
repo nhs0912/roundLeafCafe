@@ -2,7 +2,7 @@ package com.ypdchurch.roundleafcafe.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
-import com.ypdchurch.roundleafcafe.common.auth.jwt.filter.JwtAuthFilter;
+import com.ypdchurch.roundleafcafe.common.auth.jwt.filter.AuthenticationFilter;
 import com.ypdchurch.roundleafcafe.common.exception.MemberCustomException;
 import com.ypdchurch.roundleafcafe.common.exception.code.MemberErrorCode;
 import com.ypdchurch.roundleafcafe.common.exception.handler.LoginFailHandler;
@@ -97,14 +97,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthFilter MemberEmailPasswordFilter() {
-        JwtAuthFilter jwtAuthFilter = new JwtAuthFilter("/api/member/signin", objectMapper);
-        jwtAuthFilter.setAuthenticationManager(authenticationManager());
-        jwtAuthFilter.setAuthenticationSuccessHandler(new LoginSuccessHandler(jwtProvider, tokenService));
-        jwtAuthFilter.setAuthenticationFailureHandler(new LoginFailHandler(objectMapper));
-        jwtAuthFilter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
+    public AuthenticationFilter MemberEmailPasswordFilter() {
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter("/api/member/signin", objectMapper);
+        authenticationFilter.setAuthenticationManager(authenticationManager());
+        authenticationFilter.setAuthenticationSuccessHandler(new LoginSuccessHandler(jwtProvider, tokenService));
+        authenticationFilter.setAuthenticationFailureHandler(new LoginFailHandler(objectMapper));
+        authenticationFilter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
 
-        return jwtAuthFilter;
+        return authenticationFilter;
     }
 
     @Bean
