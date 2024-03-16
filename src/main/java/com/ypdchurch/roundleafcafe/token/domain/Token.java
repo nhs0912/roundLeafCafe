@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
@@ -18,7 +20,6 @@ public class Token extends BaseEntity {
     @Column(name = "token_id", updatable = false)
     private Long id;
 
-    @NotEmpty
     @Column(name = "member_id", nullable = false)
     private Long memberId;
 
@@ -27,16 +28,21 @@ public class Token extends BaseEntity {
     private String email;
 
     @NotEmpty
-    @Column(name = "refresh_token", nullable = false)
+    @Column(name = "access_token", nullable = false, length = 512)
+    private String accessToken;
+
+    @NotEmpty
+    @Column(name = "refresh_token", nullable = false, length = 512)
     private String refreshToken;
 
     @Enumerated(EnumType.STRING)
     private TokenStatus status;
 
+    @Column(updatable = false)
+    private LocalDateTime endAt;
+
     public Token updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
         return this;
     }
-
-
 }
