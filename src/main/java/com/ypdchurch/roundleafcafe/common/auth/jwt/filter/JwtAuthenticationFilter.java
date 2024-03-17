@@ -14,18 +14,20 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import java.io.IOException;
 
 @Slf4j
-public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
+public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private final ObjectMapper objectMapper;
 
-    public JwtAuthFilter(String url, ObjectMapper objectMapper) {
+    public JwtAuthenticationFilter(String url, ObjectMapper objectMapper) {
         super(url);
         this.objectMapper = objectMapper;
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
+        log.info("attemptAuthentication 실행!");
         EmailPassword emailPassword = objectMapper.readValue(request.getInputStream(), EmailPassword.class);
+
         UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(
                 emailPassword.getEmail(),
                 emailPassword.getPassword()
