@@ -2,7 +2,8 @@ package com.ypdchurch.roundleafcafe.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
-import com.ypdchurch.roundleafcafe.common.auth.jwt.filter.AuthenticationFilter;
+import com.ypdchurch.roundleafcafe.common.auth.jwt.filter.JwtAuthenticationFilter;
+import com.ypdchurch.roundleafcafe.common.auth.jwt.filter.JwtAuthorizationFilter;
 import com.ypdchurch.roundleafcafe.common.exception.MemberCustomException;
 import com.ypdchurch.roundleafcafe.common.exception.code.MemberErrorCode;
 import com.ypdchurch.roundleafcafe.common.exception.handler.LoginFailHandler;
@@ -39,7 +40,7 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 
 @Slf4j
 @Configuration
-@EnableWebSecurity(debug = false) //운영에서는 false로 설정
+@EnableWebSecurity(debug = true) //운영에서는 false로 설정
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -73,10 +74,12 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers(PathRequest.toH2Console()).permitAll();
+
                     request.requestMatchers(antMatcher("/")).permitAll();
                     request.requestMatchers(antMatcher("/api/member/join")).permitAll();
-                    request.requestMatchers(antMatcher("/api/member/signin")).permitAll();
-                    request.requestMatchers(antMatcher("/api/order/**")).permitAll();
+                    request.requestMatchers(antMatcher("/api/member/signin")).permitAll()
+                    .anyRequest().authenticated();
+//                    request.requestMatchers(antMatcher("/api/order/**")).permitAll();
 //                    request.requestMatchers(antMatcher("/admin")).hasRole(MemberRole.ADMIN.name());
 //                    request.requestMatchers(antMatcher("/api/customer/**"));
 
@@ -85,6 +88,8 @@ public class SecurityConfig {
 //                            .anyRequest().authenticated();
                 })
                 .addFilterBefore(MemberEmailPasswordFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthorizationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
+
                 .exceptionHandling(custom -> custom.authenticationEntryPoint((request, response, authException) -> {
                     log.error("heeseok response = {}", response);
                     CustomResponseUtil.unAuthentication(response, "로그인을 해야합니다.");
@@ -97,10 +102,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationFilter MemberEmailPasswordFilter() {
-        AuthenticationFilter authenticationFilter = new AuthenticationFilter("/api/member/signin", objectMapper);
+    public JwtAuthenticationFilter MemberEmailPasswordFilter() {
+        JwtAuthenticationFilter authenticationFilter = new JwtAuthenticationFilter("/api/member/signin", objectMapper);
         authenticationFilter.setAuthenticationManager(authenticationManager());
-        authenticationFilter.setAuthenticationSuccessHandler(new LoginSuccessHandler(jwtProvider, tokenService));
+        authenticationFilter.setAuthenticationSuccessHandler(new LoginSuccessHandler(tokenService));
         authenticationFilter.setAuthenticationFailureHandler(new LoginFailHandler(objectMapper));
         authenticationFilter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
 
@@ -114,6 +119,15 @@ public class SecurityConfig {
         provider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(provider);
     }
+
+//    @Bean
+//    public AuthorizationManager authorizationManager() {
+//        Author
+////        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+//        provider.setUserDetailsService(userDetailsService(memberRepository));
+//        provider.setPasswordEncoder(passwordEncoder());
+//        return new ProviderManager(provider);
+//    }
 
     @Bean
     public UserDetailsService userDetailsService(MemberRepository memberRepository) {

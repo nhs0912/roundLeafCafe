@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
@@ -19,7 +21,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @RequiredArgsConstructor
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
-    private final JwtProvider jwtProvider;
     private final TokenService tokenService;
 
     @Override
@@ -29,7 +30,14 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         MemberPrincipal principal = (MemberPrincipal) authentication.getPrincipal();
         log.info("[인증성공] user={}, password = {}", principal.getUsername(), principal.getPassword());
         AuthenticationTokens tokens = tokenService.getAuthenticationTokens(principal.getUsername());
-        tokenService.registerRefreshToken(tokens.getRefreshToken());
+
+        tokenService.registerRefreshToken(tokens);
+
+        SecurityContext context = SecurityContextHolder.getContextHolderStrategy().createEmptyContext();
+        context.setAuthentication(authentication);
+
+        SecurityContextHolder.setContext(context);
+
 
         setupLoginSuccessResponse(response, AuthenticationTokens.builder()
                 .accessToken(tokens.getAccessToken())

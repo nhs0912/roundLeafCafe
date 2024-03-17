@@ -37,13 +37,14 @@ public class TokenService {
                 .orElseThrow(() -> new TokenCustomException(TokenErrorCode.TOKEN_IS_NOT_FOUND));
     }
 
-    public Token registerRefreshToken(String token) {
+    public Token registerRefreshToken(AuthenticationTokens token) {
 
-        String memberEmailText = jwtProvider.findEmail(token);
+        String memberEmailText = jwtProvider.findEmail(token.getRefreshToken());
 
         Member member = memberService.findByEmail(memberEmailText);
         Token refreshToken = Token.builder()
-                .refreshToken(token)
+                .refreshToken(token.getRefreshToken())
+                .accessToken(token.getAccessToken())
                 .memberId(member.getId())
                 .email(memberEmailText)
                 .status(TokenStatus.ACTIVE)
