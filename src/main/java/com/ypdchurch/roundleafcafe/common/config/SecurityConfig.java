@@ -78,20 +78,12 @@ public class SecurityConfig {
                     request.requestMatchers(antMatcher("/")).permitAll();
                     request.requestMatchers(antMatcher("/api/member/join")).permitAll();
                     request.requestMatchers(antMatcher("/api/member/signin")).permitAll()
-                    .anyRequest().authenticated();
-//                    request.requestMatchers(antMatcher("/api/order/**")).permitAll();
-//                    request.requestMatchers(antMatcher("/admin")).hasRole(MemberRole.ADMIN.name());
-//                    request.requestMatchers(antMatcher("/api/customer/**"));
-
-//                    request.requestMatchers(antMatcher("/api/manager/**")).hasRole(MemberRole.MANAGER.name());
-//                    request.requestMatchers(antMatcher("/api/staff/**")).hasRole(MemberRole.STAFF.name())
-//                            .anyRequest().authenticated();
+                            .anyRequest().authenticated();
                 })
                 .addFilterBefore(MemberEmailPasswordFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtAuthorizationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
 
                 .exceptionHandling(custom -> custom.authenticationEntryPoint((request, response, authException) -> {
-                    log.error("heeseok response = {}", response);
                     CustomResponseUtil.unAuthentication(response, "로그인을 해야합니다.");
                 }))
                 //jSessionId 사용 거부
@@ -120,15 +112,6 @@ public class SecurityConfig {
         return new ProviderManager(provider);
     }
 
-//    @Bean
-//    public AuthorizationManager authorizationManager() {
-//        Author
-////        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-//        provider.setUserDetailsService(userDetailsService(memberRepository));
-//        provider.setPasswordEncoder(passwordEncoder());
-//        return new ProviderManager(provider);
-//    }
-
     @Bean
     public UserDetailsService userDetailsService(MemberRepository memberRepository) {
         return username -> {
@@ -138,7 +121,6 @@ public class SecurityConfig {
             return new MemberPrincipal(member);
         };
     }
-
     public CorsConfigurationSource configurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedHeader("*");
