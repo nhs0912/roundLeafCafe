@@ -42,4 +42,19 @@ public class Order extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
+    public Order changeOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+        return this.of(this);
+    }
+
+    private Order of(Order order) {
+        return Order.builder()
+                .id(order.getId())
+                .memberId(order.getMemberId())
+                .orderStatus(order.getOrderStatus())
+                .requests(order.getRequests())
+                .basketId(order.getBasketId())
+                .build();
+    }
+
 }
