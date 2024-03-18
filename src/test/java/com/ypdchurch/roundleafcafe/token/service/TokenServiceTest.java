@@ -4,6 +4,7 @@ import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.repository.MemberRepository;
 import com.ypdchurch.roundleafcafe.member.service.MemberService;
+import com.ypdchurch.roundleafcafe.token.domain.AuthenticationTokens;
 import com.ypdchurch.roundleafcafe.token.domain.Token;
 import com.ypdchurch.roundleafcafe.token.repository.TokenRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -28,16 +29,10 @@ import static org.mockito.Mockito.when;
 class TokenServiceTest {
     @InjectMocks
     private TokenService tokenService;
-
     @Mock
     private TokenRepository tokenRepository;
-
     @Mock
     private MemberService memberService;
-
-    @Mock
-    private MemberRepository memberRepository;
-
     @Mock
     private JwtProvider jwtProvider;
 
@@ -49,15 +44,21 @@ class TokenServiceTest {
                 .id(1L)
                 .email("tom@gmail.com")
                 .build();
-        String tokenText = "refreshToken123456789";
+        String accessToken = jwtProvider.createAccessToken(member.getEmail());
+        String refreshToken = jwtProvider.createRefreshToken(member.getEmail());
         //when
         when(memberService.findByEmail(any())).thenReturn(member);
         when(tokenRepository.save(any())).thenReturn(Token.builder()
-                .refreshToken(tokenText)
+                .refreshToken(refreshToken)
+                .accessToken(accessToken)
                 .email("tom@gmail.com")
                 .build());
 
-        Token registeredRefreshToken = tokenService.registerRefreshToken(tokenText);
+        AuthenticationTokens tokens = AuthenticationTokens.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+        Token registeredRefreshToken = tokenService.registerRefreshToken(tokens);
         //then
         assertThat(registeredRefreshToken.getEmail()).isEqualTo("tom@gmail.com");
     }
