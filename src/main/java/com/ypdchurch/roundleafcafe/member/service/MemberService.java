@@ -43,6 +43,7 @@ public class MemberService {
                 .orElseThrow(() -> new MemberCustomException(MemberErrorCode.MEMBER_NOT_FOUND.getMessage()));
     }
 
+    @Transactional
     public void deleteAll() {
         memberRepository.deleteAll();
     }
