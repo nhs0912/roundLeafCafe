@@ -6,6 +6,9 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,13 +23,11 @@ import java.util.UUID;
 
 @Slf4j
 @Configuration
-@RequiredArgsConstructor
 public class JwtProvider {
     private static final int ONE_DAY = 1000 * 60 * 60 * 24; // 24시간
     private static final int TWO_DAY = 1000 * 60 * 60 * 48; // 48시간
     public static final String TOKEN_PREFIX = "Bearer "; // 스페이스 필요함
     public static final String REFRESH_TOKEN_HEADER = "refreshToken";
-
 
     @Value("${custom.jwt.secretKey}")
     private String secretKey;
@@ -71,7 +72,7 @@ public class JwtProvider {
         return new UsernamePasswordAuthenticationToken(email, token, null);
     }
 
-    public boolean isValidToken(String token) {
+    public boolean isValid(String token) {
         try {
             Jws<Claims> claimsJws = getClaims(token);
             log.info("claimsJws isValid == {}", claimsJws);
@@ -101,3 +102,4 @@ public class JwtProvider {
     }
 
 }
+

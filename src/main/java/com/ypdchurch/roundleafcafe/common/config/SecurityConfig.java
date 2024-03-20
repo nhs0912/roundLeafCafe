@@ -6,10 +6,13 @@ import com.ypdchurch.roundleafcafe.common.auth.jwt.filter.JwtAuthenticationFilte
 import com.ypdchurch.roundleafcafe.common.auth.jwt.filter.JwtAuthorizationFilter;
 import com.ypdchurch.roundleafcafe.common.exception.MemberCustomException;
 import com.ypdchurch.roundleafcafe.common.exception.code.MemberErrorCode;
+import com.ypdchurch.roundleafcafe.common.exception.handler.Http401Handler;
+import com.ypdchurch.roundleafcafe.common.exception.handler.Http403Handler;
 import com.ypdchurch.roundleafcafe.common.exception.handler.LoginFailHandler;
 import com.ypdchurch.roundleafcafe.common.exception.handler.LoginSuccessHandler;
 import com.ypdchurch.roundleafcafe.common.util.CustomResponseUtil;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
+import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import com.ypdchurch.roundleafcafe.member.repository.MemberRepository;
 import com.ypdchurch.roundleafcafe.token.service.TokenService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -77,14 +81,18 @@ public class SecurityConfig {
 
                     request.requestMatchers(antMatcher("/")).permitAll();
                     request.requestMatchers(antMatcher("/api/member/join")).permitAll();
-                    request.requestMatchers(antMatcher("/api/member/signin")).permitAll()
+                    request.requestMatchers(antMatcher("/api/member/signin")).permitAll();
+                    request.requestMatchers(antMatcher("/api/admin/**")).hasAnyRole(MemberRole.ADMIN.name())
                             .anyRequest().authenticated();
+
                 })
-                .addFilterBefore(MemberEmailPasswordFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JwtAuthorizationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(MemberEmailPasswordFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthorizationFilter(jwtProvider, tokenService), UsernamePasswordAuthenticationFilter.class)
 
                 .exceptionHandling(custom -> custom.authenticationEntryPoint((request, response, authException) -> {
-                    CustomResponseUtil.unAuthentication(response, "로그인을 해야합니다.");
+                    custom.accessDeniedHandler(new Http403Handler());
+                    custom.authenticationEntryPoint(new Http401Handler(objectMapper));
+//                    CustomResponseUtil.unAuthentication(response, "로그인을 해야합니다.");
                 }))
                 //jSessionId 사용 거부
                 .sessionManagement(sessionManegement
@@ -121,6 +129,7 @@ public class SecurityConfig {
             return new MemberPrincipal(member);
         };
     }
+
     public CorsConfigurationSource configurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedHeader("*");

@@ -1,6 +1,7 @@
 package com.ypdchurch.roundleafcafe.token.service;
 
 import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
+import com.ypdchurch.roundleafcafe.common.config.MemberPrincipal;
 import com.ypdchurch.roundleafcafe.common.exception.TokenCustomException;
 import com.ypdchurch.roundleafcafe.common.exception.code.TokenErrorCode;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
@@ -12,6 +13,9 @@ import com.ypdchurch.roundleafcafe.token.repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -19,34 +23,30 @@ import org.springframework.stereotype.Service;
 public class TokenService {
 
     private final TokenRepository tokenRepository;
-    private final MemberService memberService;
     private final JwtProvider jwtProvider;
 
-    public Token findByRefreshToken(String token) {
-        return tokenRepository.findByRefreshToken(token)
-                .orElseThrow(() -> new TokenCustomException(TokenErrorCode.TOKEN_IS_NOT_FOUND));
+    public Optional<Token> findByRefreshToken(String token) {
+        return tokenRepository.findByRefreshToken(token);
     }
 
-    public Token findByEmail(String email) {
-        return tokenRepository.findByEmail(email)
-                .orElseThrow(() -> new TokenCustomException(TokenErrorCode.TOKEN_IS_NOT_FOUND));
+    public Optional<Token> findByAccessToken(String token) {
+        return tokenRepository.findByAccessToken(token);
     }
 
-    public Token findByMemberId(Long memberId) {
-        return tokenRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new TokenCustomException(TokenErrorCode.TOKEN_IS_NOT_FOUND));
+    public Optional<Token> findByEmail(String email) {
+        return tokenRepository.findByEmail(email);
     }
 
-    public Token registerRefreshToken(AuthenticationTokens token) {
+    public Optional<Token> findByMemberId(Long memberId) {
+        return tokenRepository.findByMemberId(memberId);
+    }
 
-        String memberEmailText = jwtProvider.findEmail(token.getRefreshToken());
-
-        Member member = memberService.findByEmail(memberEmailText);
+    public Token registerRefreshToken(AuthenticationTokens token, Member member) {
         Token refreshToken = Token.builder()
                 .refreshToken(token.getRefreshToken())
                 .accessToken(token.getAccessToken())
                 .memberId(member.getId())
-                .email(memberEmailText)
+                .email(member.getEmail())
                 .status(TokenStatus.ACTIVE)
                 .build();
         return tokenRepository.save(refreshToken);
@@ -70,13 +70,13 @@ public class TokenService {
 //        });
 //    }
 
-    public Token updateRefreshToken(String token) {
-        if (!jwtProvider.isValidToken(token)) {
+    public Token updateRefreshToken(Token token) {
+        if (!token.isValidRefreshToken()) {
             throw new TokenCustomException(TokenErrorCode.INVALID_TOKEN);
         }
-
-        Token refreshToken = findByRefreshToken(token);
-        return refreshToken.updateRefreshToken(token);
+        Optional<Token> refreshTokenOptional = findByRefreshToken(token.getRefreshToken());
+        String newRefreshToken = jwtProvider.createRefreshToken(token.getEmail());
+        return refreshTokenOptional.get().updateRefreshToken(newRefreshToken);
     }
 
 //    public Token processToken(String token, ProcessTokenProcess block) {
@@ -96,17 +96,18 @@ public class TokenService {
     }
 
     public void deleteByRefreshToken(String token) {
-        Token refreshToken = findByRefreshToken(token);
+        Token refreshToken = findByRefreshToken(token)
+                .get();
         tokenRepository.delete(refreshToken);
     }
 
     public void deleteByEmail(String email) {
-        Token refreshToken = findByEmail(email);
+        Token refreshToken = findByEmail(email).get();
         this.deleteByRefreshToken(refreshToken.getRefreshToken());
     }
 
     public void deleteByMemberId(Long memberId) {
-        Token refreshToken = findByMemberId(memberId);
+        Token refreshToken = findByMemberId(memberId).get();
         this.deleteByRefreshToken(refreshToken.getRefreshToken());
     }
 

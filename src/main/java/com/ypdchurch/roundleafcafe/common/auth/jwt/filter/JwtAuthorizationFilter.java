@@ -3,6 +3,8 @@ package com.ypdchurch.roundleafcafe.common.auth.jwt.filter;
 import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
 import com.ypdchurch.roundleafcafe.common.exception.TokenCustomException;
 import com.ypdchurch.roundleafcafe.common.exception.code.TokenErrorCode;
+import com.ypdchurch.roundleafcafe.token.domain.Token;
+import com.ypdchurch.roundleafcafe.token.service.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,39 +18,54 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.thymeleaf.util.StringUtils;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
+    private final TokenService tokenService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
         String accessTokenHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-//        String refreshTokenHeader = request.getHeader(JwtProvider.REFRESH_TOKEN_HEADER);
+        Optional<String> accessTokenOptional = findToken(accessTokenHeader);
 
-        if (!StringUtils.isEmpty(accessTokenHeader)) {
-            String accessToken = findToken(accessTokenHeader);
-//        String refreshToken = findToken(refreshTokenHeader);
+        if (accessTokenOptional.isEmpty()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            if (!jwtProvider.isValidToken(accessToken)) {
-                throw new TokenCustomException(TokenErrorCode.INVALID_TOKEN);
-            }
+        String email = jwtProvider.findEmail(accessTokenOptional.get());
+        Token foundAccessToken = tokenService.findByAccessToken(email)
+                .orElseThrow(() -> new TokenCustomException(TokenErrorCode.TOKEN_IS_NOT_FOUND));
 
-            Authentication authentication = jwtProvider.getAuthentication(accessToken);
+        if (!foundAccessToken.isValidAccessToken() && foundAccessToken.isValidRefreshToken()) {
+            Token newToken = makeNewToken(foundAccessToken, email);
+            Authentication authentication = jwtProvider.getAuthentication(newToken.getAccessToken());
             SecurityContextHolder.getContext().setAuthentication(authentication);
             log.info("AuthorizationFilter doFilterInternal authentication = {}", authentication);
-            log.info("AuthorizationFilter doFilterInternal accessToken = {}", accessToken);
-//        log.info("AuthorizationFilter doFilterInternal refreshToken = {}", refreshToken);
+            filterChain.doFilter(request, response);
         }
-        filterChain.doFilter(request, response);
+
+        if (!foundAccessToken.isValidAccessToken() && !foundAccessToken.isValidRefreshToken()) {
+            log.info("두개의 토큰 유효성 불일치 로그인 페이지 이동");
+            response.sendRedirect("api/member/signin");
+            throw new TokenCustomException(TokenErrorCode.NEED_TO_LOGIN_AGAIN);
+        }
     }
 
-    private String findToken(String tokenHeader) {
+    private Token makeNewToken(Token foundAccessToken, String email) {
+        String newRefreshTokenText = jwtProvider.createRefreshToken(email);
+        String newAccessTokenText = jwtProvider.createAccessToken(email);
+        Token updateRefreshToken = foundAccessToken.updateRefreshToken(newRefreshTokenText);
+        return updateRefreshToken.updateAccessToken(newAccessTokenText);
+    }
+
+    private Optional<String> findToken(String tokenHeader) {
         if (StringUtils.isEmpty(tokenHeader)) {
-            throw new TokenCustomException(TokenErrorCode.TOKEN_IS_NOT_FOUND);
+            return Optional.empty();
         }
-        return tokenHeader.substring(JwtProvider.TOKEN_PREFIX.length());
+        return Optional.of(tokenHeader.substring(JwtProvider.TOKEN_PREFIX.length()));
     }
 }

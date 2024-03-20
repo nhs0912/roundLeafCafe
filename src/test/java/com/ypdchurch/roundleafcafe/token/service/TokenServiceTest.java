@@ -32,8 +32,6 @@ class TokenServiceTest {
     @Mock
     private TokenRepository tokenRepository;
     @Mock
-    private MemberService memberService;
-    @Mock
     private JwtProvider jwtProvider;
 
     @Test
@@ -47,7 +45,6 @@ class TokenServiceTest {
         String accessToken = jwtProvider.createAccessToken(member.getEmail());
         String refreshToken = jwtProvider.createRefreshToken(member.getEmail());
         //when
-        when(memberService.findByEmail(any())).thenReturn(member);
         when(tokenRepository.save(any())).thenReturn(Token.builder()
                 .refreshToken(refreshToken)
                 .accessToken(accessToken)
@@ -58,7 +55,7 @@ class TokenServiceTest {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
-        Token registeredRefreshToken = tokenService.registerRefreshToken(tokens);
+        Token registeredRefreshToken = tokenService.registerRefreshToken(tokens, member);
         //then
         assertThat(registeredRefreshToken.getEmail()).isEqualTo("tom@gmail.com");
     }

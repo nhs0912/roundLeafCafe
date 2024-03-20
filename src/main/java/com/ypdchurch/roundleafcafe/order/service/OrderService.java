@@ -1,5 +1,6 @@
 package com.ypdchurch.roundleafcafe.order.service;
 
+import com.ypdchurch.roundleafcafe.member.service.MemberService;
 import com.ypdchurch.roundleafcafe.order.domain.Order;
 import com.ypdchurch.roundleafcafe.order.enums.OrderStatus;
 import com.ypdchurch.roundleafcafe.order.repository.OrderRepository;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
+    private MemberService memberService;
 
     public OrderService(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
@@ -23,7 +25,7 @@ public class OrderService {
 
     @Transactional
     public Order changeOrderStatus(Order order, OrderStatus orderStatus) {
-        order.changeOrderStatus(orderStatus);
-        return orderRepository.save(order);
+        Order changedOrderStatus = order.changeOrderStatus(orderStatus);
+        return orderRepository.save(changedOrderStatus);
     }
 }

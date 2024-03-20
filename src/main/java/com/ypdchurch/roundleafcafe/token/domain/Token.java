@@ -1,12 +1,21 @@
 package com.ypdchurch.roundleafcafe.token.domain;
 
+import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
 import com.ypdchurch.roundleafcafe.common.domain.BaseEntity;
 import com.ypdchurch.roundleafcafe.token.enums.TokenStatus;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
+import org.springframework.beans.factory.annotation.Value;
 
+import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
+import java.util.Base64;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -14,6 +23,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity(name = "token")
 public class Token extends BaseEntity {
+
+    @Transient
+    @Value("${custom.jwt.secretKey}")
+    private String secretKey;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,11 +51,43 @@ public class Token extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TokenStatus status;
 
-    @Column(updatable = false)
-    private LocalDateTime endAt;
-
     public Token updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
         return this;
+    }
+
+    public Token updateAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+        return this;
+    }
+
+    public boolean isValidAccessToken() {
+        return this.isValidToken(this.getAccessToken());
+    }
+
+    public boolean isValidRefreshToken() {
+        return this.isValidToken(this.getRefreshToken());
+    }
+
+    private boolean isValidToken(String token) {
+        try {
+            Jws<Claims> claimsJws = getClaims(token);
+            return true;
+        } catch (JwtException e) {
+            return false;
+        }
+    }
+
+    private Jws<Claims> getClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(makeEncryptedSecretKey(secretKey))
+                .build()
+                .parseSignedClaims(token);
+    }
+
+    private SecretKey makeEncryptedSecretKey(String secretKey) {
+        String base64SecretKey = Base64.getEncoder()
+                .encodeToString(secretKey.getBytes());
+        return Keys.hmacShaKeyFor(base64SecretKey.getBytes());
     }
 }
