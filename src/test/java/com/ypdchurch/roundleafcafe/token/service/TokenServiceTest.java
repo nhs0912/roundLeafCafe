@@ -59,4 +59,55 @@ class TokenServiceTest {
         //then
         assertThat(registeredRefreshToken.getEmail()).isEqualTo("tom@gmail.com");
     }
+
+    @Test
+    @DisplayName("Token 삭제 memberId 서비스 저장 성공")
+    public void deleteByMemberIdSuccessTest() {
+        //given
+        Member member = Member.builder()
+                .id(1L)
+                .email("tom@gmail.com")
+                .build();
+        String accessToken = jwtProvider.createAccessToken(member.getEmail());
+        String refreshToken = jwtProvider.createRefreshToken(member.getEmail());
+        Token token = Token.builder()
+                .refreshToken(refreshToken)
+                .accessToken(accessToken)
+                .memberId(member.getId())
+                .email("tom@gmail.com")
+                .build();
+        //when
+        when(tokenRepository.findByMemberId(any()))
+                .thenReturn(Optional.ofNullable(token));
+
+        Optional<Long> memberIdOptional = tokenService.deleteByMemberId(member.getId());
+
+        //then
+        assertThat(memberIdOptional.isPresent()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Token 삭제 email 서비스 저장 성공")
+    public void deleteByEmailSuccessTest() {
+        //given
+        Member member = Member.builder()
+                .id(1L)
+                .email("tom@gmail.com")
+                .build();
+        String accessToken = jwtProvider.createAccessToken(member.getEmail());
+        String refreshToken = jwtProvider.createRefreshToken(member.getEmail());
+        Token token = Token.builder()
+                .refreshToken(refreshToken)
+                .accessToken(accessToken)
+                .memberId(member.getId())
+                .email("tom@gmail.com")
+                .build();
+        //when
+        when(tokenRepository.findByEmail(any()))
+                .thenReturn(Optional.ofNullable(token));
+
+        Optional<Long> memberIdOptional = tokenService.deleteByEmail(member.getEmail());
+        //then
+        assertThat(memberIdOptional.isPresent()).isTrue();
+    }
 }

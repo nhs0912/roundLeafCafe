@@ -52,39 +52,11 @@ public class TokenService {
         return tokenRepository.save(refreshToken);
     }
 
-//    public Token registerRefreshToken(String token) {
-//        return processToken(token, block -> {
-//            Optional<String> memberIdText = jwtProvider.findMemberId(token);
-//            if (memberIdText.isPresent()) {
-//                Long memberId = Long.valueOf(memberIdText.get());
-//                Member foundMember = memberService.findById(memberId);
-//                Token refreshToken = Token.builder()
-//                        .refreshToken(token)
-//                        .memberId(memberId)
-//                        .email(foundMember.getEmail())
-//                        .status(TokenStatus.ACTIVE)
-//                        .build();
-//                return tokenRepository.save(refreshToken);
-//            }
-//            return null;
-//        });
-//    }
-
     public Token updateRefreshToken(Token token) {
-        if (!token.isValidRefreshToken()) {
-            throw new TokenCustomException(TokenErrorCode.INVALID_TOKEN);
-        }
-        Optional<Token> refreshTokenOptional = findByRefreshToken(token.getRefreshToken());
+        token.isValidRefreshToken();
         String newRefreshToken = jwtProvider.createRefreshToken(token.getEmail());
-        return refreshTokenOptional.get().updateRefreshToken(newRefreshToken);
+        return token.updateRefreshToken(newRefreshToken);
     }
-
-//    public Token processToken(String token, ProcessTokenProcess block) {
-//        if (!jwtProvider.isValidToken(token)) {
-//            throw new TokenCustomException(TokenErrorCode.INVALID_TOKEN);
-//        }
-//        return block.process(token);
-//    }
 
     public AuthenticationTokens getAuthenticationTokens(String email) {
         String refreshToken = jwtProvider.createRefreshToken(email);
@@ -95,23 +67,29 @@ public class TokenService {
                 .build();
     }
 
-    public void deleteByRefreshToken(String token) {
-        Token refreshToken = findByRefreshToken(token)
-                .get();
-        tokenRepository.delete(refreshToken);
+    public Optional<Long> deleteByRefreshToken(String token) {
+        Optional<Token> refreshTokenOptional = findByRefreshToken(token);
+        if (refreshTokenOptional.isEmpty()) {
+            return Optional.empty();
+        }
+        Token registeredRefreshToken = refreshTokenOptional.get();
+        tokenRepository.delete(registeredRefreshToken);
+        return Optional.ofNullable(registeredRefreshToken.getId());
     }
 
-    public void deleteByEmail(String email) {
-        Token refreshToken = findByEmail(email).get();
-        this.deleteByRefreshToken(refreshToken.getRefreshToken());
+    public Optional<Long> deleteByEmail(String email) {
+        Optional<Token> refreshTokenOptional = findByEmail(email);
+        return refreshTokenOptional.flatMap(this::deleteToken);
     }
 
-    public void deleteByMemberId(Long memberId) {
-        Token refreshToken = findByMemberId(memberId).get();
-        this.deleteByRefreshToken(refreshToken.getRefreshToken());
+    public Optional<Long> deleteByMemberId(Long memberId) {
+        Optional<Token> refreshTokenOptional = findByMemberId(memberId);
+        return refreshTokenOptional.flatMap(this::deleteToken);
     }
 
-    private interface ProcessTokenProcess {
-        abstract Token process(String token);
+    private Optional<Long> deleteToken(Token token) {
+        this.deleteByRefreshToken(token.getRefreshToken());
+        return Optional.ofNullable(token.getMemberId());
     }
+
 }

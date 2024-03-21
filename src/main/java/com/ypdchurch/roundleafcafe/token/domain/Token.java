@@ -2,11 +2,10 @@ package com.ypdchurch.roundleafcafe.token.domain;
 
 import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
 import com.ypdchurch.roundleafcafe.common.domain.BaseEntity;
+import com.ypdchurch.roundleafcafe.common.exception.TokenCustomException;
+import com.ypdchurch.roundleafcafe.common.exception.code.TokenErrorCode;
 import com.ypdchurch.roundleafcafe.token.enums.TokenStatus;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
@@ -73,8 +72,10 @@ public class Token extends BaseEntity {
         try {
             Jws<Claims> claimsJws = getClaims(token);
             return true;
-        } catch (JwtException e) {
-            return false;
+        } catch (SecurityException | MalformedJwtException | io.jsonwebtoken.security.SignatureException e) {
+            throw new TokenCustomException(TokenErrorCode.INVALID_TOKEN);
+        } catch (ExpiredJwtException e) {
+            throw new TokenCustomException(TokenErrorCode.TOKEN_IS_EXPIRED);
         }
     }
 
