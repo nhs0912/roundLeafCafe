@@ -52,7 +52,12 @@ public class Order extends BaseEntity {
     }
 
     public Order menuAlready() {
-        this.orderStatus = OrderStatus.MENU_ALREADY;
+        this.orderStatus = OrderStatus.MENU_ALREADY_COMPLETE;
+        return this;
+    }
+
+    public Order cooking() {
+        this.orderStatus = OrderStatus.COOKING;
         return this;
     }
 
@@ -66,7 +71,7 @@ public class Order extends BaseEntity {
         return this;
     }
 
-    public Order cancle() {
+    public Order cancel() {
         this.orderStatus = OrderStatus.CANCEL;
         return this;
     }

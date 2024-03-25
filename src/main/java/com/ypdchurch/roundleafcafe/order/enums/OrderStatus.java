@@ -5,7 +5,7 @@ public enum OrderStatus {
     ORDER_ACCEPTED("02"),
     ORDER_CONFIRMED("03"),
     COOKING("04"),
-    MENU_ALREADY("05"),
+    MENU_ALREADY_COMPLETE("05"),
     PICK_UP_COMPLETE("06"),
     WHOLE_COMPLETE("07"),
     CANCEL("90");
