@@ -1,0 +1,20 @@
+### order page
+
+### order menu GET TEST
+GET {{url}}/api/order/menu
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+
+### order menu POST TEST
+POST {{url}}/api/order/menu
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "memberId": "1",
+  "basketId": "1",
+  "totalPrice": "34000",
+  "requests": "3인분 같은 1인분 주세요",
+  "orderStatus": "ORDER_ACCEPTED"
+}

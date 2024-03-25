@@ -2,19 +2,25 @@ package com.ypdchurch.roundleafcafe.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
-import com.ypdchurch.roundleafcafe.common.auth.jwt.filter.JwtAuthFilter;
+import com.ypdchurch.roundleafcafe.common.auth.jwt.filter.JwtAuthenticationFilter;
+import com.ypdchurch.roundleafcafe.common.auth.jwt.filter.JwtAuthorizationFilter;
 import com.ypdchurch.roundleafcafe.common.exception.MemberCustomException;
 import com.ypdchurch.roundleafcafe.common.exception.code.MemberErrorCode;
+import com.ypdchurch.roundleafcafe.common.exception.handler.Http401Handler;
+import com.ypdchurch.roundleafcafe.common.exception.handler.Http403Handler;
 import com.ypdchurch.roundleafcafe.common.exception.handler.LoginFailHandler;
 import com.ypdchurch.roundleafcafe.common.exception.handler.LoginSuccessHandler;
 import com.ypdchurch.roundleafcafe.common.util.CustomResponseUtil;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
+import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
 import com.ypdchurch.roundleafcafe.member.repository.MemberRepository;
+import com.ypdchurch.roundleafcafe.token.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -38,13 +44,14 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 
 @Slf4j
 @Configuration
-@EnableWebSecurity(debug = false) //운영에서는 false로 설정
+@EnableWebSecurity(debug = true) //운영에서는 false로 설정
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final MemberRepository memberRepository;
     private final ObjectMapper objectMapper;
     private final JwtProvider jwtProvider;
+    private final TokenService tokenService;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -71,21 +78,21 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers(PathRequest.toH2Console()).permitAll();
+
                     request.requestMatchers(antMatcher("/")).permitAll();
                     request.requestMatchers(antMatcher("/api/member/join")).permitAll();
                     request.requestMatchers(antMatcher("/api/member/signin")).permitAll();
-                    request.requestMatchers(antMatcher("/api/order/**")).permitAll();
-//                    request.requestMatchers(antMatcher("/admin")).hasRole(MemberRole.ADMIN.name());
-//                    request.requestMatchers(antMatcher("/api/customer/**"));
+                    request.requestMatchers(antMatcher("/api/admin/**")).hasAnyRole(MemberRole.ADMIN.name())
+                            .anyRequest().authenticated();
 
-//                    request.requestMatchers(antMatcher("/api/manager/**")).hasRole(MemberRole.MANAGER.name());
-//                    request.requestMatchers(antMatcher("/api/staff/**")).hasRole(MemberRole.STAFF.name())
-//                            .anyRequest().authenticated();
                 })
+                .addFilterBefore(new JwtAuthorizationFilter(jwtProvider, tokenService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(MemberEmailPasswordFilter(), UsernamePasswordAuthenticationFilter.class)
+
                 .exceptionHandling(custom -> custom.authenticationEntryPoint((request, response, authException) -> {
-                    log.error("heeseok response = {}", response);
-                    CustomResponseUtil.unAuthentication(response, "로그인을 해야합니다.");
+                    custom.accessDeniedHandler(new Http403Handler());
+                    custom.authenticationEntryPoint(new Http401Handler(objectMapper));
+//                    CustomResponseUtil.unAuthentication(response, "로그인을 해야합니다.");
                 }))
                 //jSessionId 사용 거부
                 .sessionManagement(sessionManegement
@@ -95,14 +102,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthFilter MemberEmailPasswordFilter() {
-        JwtAuthFilter jwtAuthFilter = new JwtAuthFilter("/api/member/signin", objectMapper);
-        jwtAuthFilter.setAuthenticationManager(authenticationManager());
-        jwtAuthFilter.setAuthenticationSuccessHandler(new LoginSuccessHandler(jwtProvider));
-        jwtAuthFilter.setAuthenticationFailureHandler(new LoginFailHandler(objectMapper));
-        jwtAuthFilter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
+    public JwtAuthenticationFilter MemberEmailPasswordFilter() {
+        JwtAuthenticationFilter authenticationFilter = new JwtAuthenticationFilter("/api/member/signin", objectMapper);
+        authenticationFilter.setAuthenticationManager(authenticationManager());
+        authenticationFilter.setAuthenticationSuccessHandler(new LoginSuccessHandler(tokenService));
+        authenticationFilter.setAuthenticationFailureHandler(new LoginFailHandler(objectMapper));
+        authenticationFilter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
 
-        return jwtAuthFilter;
+        return authenticationFilter;
     }
 
     @Bean

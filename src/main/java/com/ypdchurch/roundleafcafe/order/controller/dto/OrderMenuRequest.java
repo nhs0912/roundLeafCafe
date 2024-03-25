@@ -2,6 +2,8 @@ package com.ypdchurch.roundleafcafe.order.controller.dto;
 
 import com.ypdchurch.roundleafcafe.order.domain.Order;
 import com.ypdchurch.roundleafcafe.order.enums.OrderStatus;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -14,6 +16,7 @@ import java.math.BigDecimal;
 @ToString
 public class OrderMenuRequest {
     @NotNull
+
     private Long memberId;
     @NotNull
     private Long basketId;
@@ -21,6 +24,8 @@ public class OrderMenuRequest {
     private BigDecimal totalPrice;
     @NotBlank
     private String requests;
+
+    @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
     public OrderMenuRequest(Long memberId, Long basketId, BigDecimal totalPrice, String requests, OrderStatus orderStatus) {

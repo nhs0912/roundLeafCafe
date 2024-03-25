@@ -1,0 +1,6 @@
+### order page
+
+### order menu GET TEST
+GET {{url}}/api/admin
+Content-Type: application/json
+Authorization: {{Authorization}}

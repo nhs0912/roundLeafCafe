@@ -1,6 +1,8 @@
 package com.ypdchurch.roundleafcafe.order.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ypdchurch.roundleafcafe.common.annotation.WithMockJwtUser;
+import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
 import com.ypdchurch.roundleafcafe.member.enums.MemberGrade;
 import com.ypdchurch.roundleafcafe.member.enums.MemberRole;
@@ -9,17 +11,29 @@ import com.ypdchurch.roundleafcafe.member.service.MemberService;
 import com.ypdchurch.roundleafcafe.order.controller.dto.OrderMenuRequest;
 import com.ypdchurch.roundleafcafe.order.enums.OrderStatus;
 import com.ypdchurch.roundleafcafe.order.service.OrderService;
+import com.ypdchurch.roundleafcafe.token.service.TokenService;
+import jakarta.annotation.PostConstruct;
+import org.aspectj.lang.annotation.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -43,19 +57,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class OrderControllerTest {
     @Autowired
     private MockMvc mockMvc;
-
-    @Mock
-    private OrderService orderService;
-
     @Mock
     private MemberService memberService;
-
-
+    @PostConstruct
+    public void settingMemberTest() {
+        Member member = Member.builder()
+                .email("nhs0912@nate.com")
+                .name("heeseok")
+                .build();
+        memberService.registerMember(member);
+    }
     @Test
     @DisplayName("주문 성공 테스트")
+    @WithMockJwtUser
     void orderSuccessTest() throws Exception {
         //give
-
         Member tom = Member.builder()
                 .name("tom")
                 .password("1234")
@@ -75,7 +91,7 @@ class OrderControllerTest {
                 .basketId(1L)
                 .totalPrice(new BigDecimal(2000))
                 .orderStatus(OrderStatus.ORDER_ACCEPTED)
-                .requests("요청사항이 많습니다!")
+                .requests("반찬 많이 주세요! ")
                 .build();
 
         ObjectMapper objectMapper = new ObjectMapper();
