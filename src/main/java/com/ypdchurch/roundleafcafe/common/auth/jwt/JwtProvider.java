@@ -6,10 +6,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +19,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Slf4j
+@Getter
 @Configuration
 public class JwtProvider {
     private static final int ONE_DAY = 1000 * 60 * 60 * 24; // 24시간
@@ -29,8 +27,11 @@ public class JwtProvider {
     public static final String TOKEN_PREFIX = "Bearer "; // 스페이스 필요함
     public static final String REFRESH_TOKEN_HEADER = "refreshToken";
 
-    @Value("${custom.jwt.secretKey}")
-    private String secretKey;
+    private final String secretKey;
+
+    public JwtProvider(@Value("${custom.jwt.secretKey}") String secretKey) {
+        this.secretKey = secretKey;
+    }
 
     public String createAccessToken(String email) {
         return Jwts.builder()

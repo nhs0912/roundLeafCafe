@@ -86,8 +86,8 @@ public class SecurityConfig {
                             .anyRequest().authenticated();
 
                 })
-//                .addFilterBefore(MemberEmailPasswordFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtAuthorizationFilter(jwtProvider, tokenService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(MemberEmailPasswordFilter(), UsernamePasswordAuthenticationFilter.class)
 
                 .exceptionHandling(custom -> custom.authenticationEntryPoint((request, response, authException) -> {
                     custom.accessDeniedHandler(new Http403Handler());

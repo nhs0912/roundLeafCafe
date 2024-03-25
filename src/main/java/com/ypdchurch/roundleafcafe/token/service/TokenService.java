@@ -53,7 +53,7 @@ public class TokenService {
     }
 
     public Token updateRefreshToken(Token token) {
-        token.isValidRefreshToken();
+        token.isValidRefreshToken(jwtProvider.getSecretKey());
         String newRefreshToken = jwtProvider.createRefreshToken(token.getEmail());
         return token.updateRefreshToken(newRefreshToken);
     }

@@ -29,18 +29,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessTokenHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        log.info("headerToken = {} ", accessTokenHeader);
         Optional<String> accessTokenOptional = findToken(accessTokenHeader);
 
         if (accessTokenOptional.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
+        log.info("accessTokenOptional token = {} ", accessTokenOptional.get());
 
         String email = jwtProvider.findEmail(accessTokenOptional.get());
-        Token foundAccessToken = tokenService.findByAccessToken(email)
+        log.info("accessTokenOptional email = {}", email);
+        String secretKey = jwtProvider.getSecretKey();
+        Token foundAccessToken = tokenService.findByEmail(email)
                 .orElseThrow(() -> new TokenCustomException(TokenErrorCode.TOKEN_IS_NOT_FOUND));
 
-        if (!foundAccessToken.isValidAccessToken() && foundAccessToken.isValidRefreshToken()) {
+        if (!foundAccessToken.isValidAccessToken(secretKey) && foundAccessToken.isValidRefreshToken(secretKey)) {
             Token newToken = makeNewToken(foundAccessToken, email);
             Authentication authentication = jwtProvider.getAuthentication(newToken.getAccessToken());
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -48,7 +52,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }
 
-        if (!foundAccessToken.isValidAccessToken() && !foundAccessToken.isValidRefreshToken()) {
+        if (!foundAccessToken.isValidAccessToken(secretKey) && !foundAccessToken.isValidRefreshToken(secretKey)) {
             log.info("두개의 토큰 유효성 불일치 로그인 페이지 이동");
             response.sendRedirect("api/member/signin");
             throw new TokenCustomException(TokenErrorCode.NEED_TO_LOGIN_AGAIN);

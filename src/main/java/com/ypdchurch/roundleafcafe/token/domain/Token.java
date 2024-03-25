@@ -22,11 +22,6 @@ import java.util.Base64;
 @AllArgsConstructor
 @Entity(name = "token")
 public class Token extends BaseEntity {
-
-    @Transient
-    @Value("${custom.jwt.secretKey}")
-    private String secretKey;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "token_id", updatable = false)
@@ -60,17 +55,17 @@ public class Token extends BaseEntity {
         return this;
     }
 
-    public boolean isValidAccessToken() {
-        return this.isValidToken(this.getAccessToken());
+    public boolean isValidAccessToken(String secretKey) {
+        return this.isValidToken(this.getAccessToken(), secretKey);
     }
 
-    public boolean isValidRefreshToken() {
-        return this.isValidToken(this.getRefreshToken());
+    public boolean isValidRefreshToken(String secretKey) {
+        return this.isValidToken(this.getRefreshToken(), secretKey);
     }
 
-    private boolean isValidToken(String token) {
+    private boolean isValidToken(String token, String secretKey) {
         try {
-            Jws<Claims> claimsJws = getClaims(token);
+            Jws<Claims> claimsJws = getClaims(token, secretKey);
             return true;
         } catch (SecurityException | MalformedJwtException | io.jsonwebtoken.security.SignatureException e) {
             throw new TokenCustomException(TokenErrorCode.INVALID_TOKEN);
@@ -79,7 +74,7 @@ public class Token extends BaseEntity {
         }
     }
 
-    private Jws<Claims> getClaims(String token) {
+    private Jws<Claims> getClaims(String token, String secretKey) {
         return Jwts.parser()
                 .verifyWith(makeEncryptedSecretKey(secretKey))
                 .build()
