@@ -2,6 +2,8 @@ package com.ypdchurch.roundleafcafe.order.domain;
 
 import com.ypdchurch.roundleafcafe.common.domain.BaseEntity;
 import com.ypdchurch.roundleafcafe.order.enums.OrderStatus;
+import com.ypdchurch.roundleafcafe.order.enums.OrderWay;
+import com.ypdchurch.roundleafcafe.order.enums.PaymentMethod;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +12,6 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Getter
-//@SuperBuilder
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -28,8 +29,11 @@ public class Order extends BaseEntity {
     private Long memberId;
 
     @NotNull
-    @Column(name = "basket_id")
-    private Long basketId;
+    @Column(name = "order_item_id")
+    private Long orderItemId;
+
+    @Column(name = "menu_option_id")
+    private Long menuOptionId;
 
     @NotNull
     @Min(value = 0, message = "총 가격은 0원 이상이어야합니다. 입력된 금액 : ${totalPrice}")
@@ -40,39 +44,49 @@ public class Order extends BaseEntity {
     private String requests;
 
     @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;    
+    private OrderStatus status;
+
+    @Column(name = "payment_method")
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod payMentMethod;
+
+    @Column(name = "order_way")
+    @Enumerated(EnumType.STRING)
+    private OrderWay way;
+
     public Order accepted() {
-        this.orderStatus = OrderStatus.ORDER_ACCEPTED;
+
+        this.status = OrderStatus.ORDER_ACCEPTED;
         return this;
     }
 
     public Order confirmed() {
-        this.orderStatus = OrderStatus.ORDER_CONFIRMED;
+        this.status = OrderStatus.ORDER_CONFIRMED;
         return this;
     }
 
     public Order menuAlready() {
-        this.orderStatus = OrderStatus.MENU_ALREADY_COMPLETE;
+        this.status = OrderStatus.MENU_ALREADY_COMPLETE;
         return this;
     }
 
     public Order cooking() {
-        this.orderStatus = OrderStatus.COOKING;
+        this.status = OrderStatus.COOKING;
         return this;
     }
 
     public Order pickup() {
-        this.orderStatus = OrderStatus.PICK_UP_COMPLETE;
+        this.status = OrderStatus.PICK_UP_COMPLETE;
         return this;
     }
 
     public Order wholeCompete() {
-        this.orderStatus = OrderStatus.WHOLE_COMPLETE;
+        this.status = OrderStatus.WHOLE_COMPLETE;
         return this;
     }
 
     public Order cancel() {
-        this.orderStatus = OrderStatus.CANCEL;
+        this.status = OrderStatus.CANCEL;
         return this;
     }
 
@@ -80,9 +94,9 @@ public class Order extends BaseEntity {
         return Order.builder()
                 .id(order.getId())
                 .memberId(order.getMemberId())
-                .orderStatus(order.getOrderStatus())
+                .status(order.getStatus())
                 .requests(order.getRequests())
-                .basketId(order.getBasketId())
+                .orderItemId(order.getOrderItemId())
                 .build();
     }
 

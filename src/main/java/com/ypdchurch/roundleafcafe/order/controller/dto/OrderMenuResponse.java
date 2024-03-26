@@ -22,9 +22,9 @@ public class OrderMenuResponse {
     public static OrderMenuResponse of(Order order) {
         return OrderMenuResponse.builder()
                 .id(order.getId())
-                .basketId(order.getBasketId())
+                .basketId(order.getOrderItemId())
                 .memberId(order.getMemberId())
-                .orderStatus(order.getOrderStatus())
+                .orderStatus(order.getStatus())
                 .requests(order.getRequests())
                 .totalPrice(order.getTotalPrice())
                 .build();

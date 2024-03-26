@@ -32,8 +32,8 @@ class OrderServiceTest {
         //given
         Order order = Order.builder()
                 .id(1L)
-                .basketId(1L)
-                .orderStatus(OrderStatus.ORDER_START)
+                .orderItemId(1L)
+                .status(OrderStatus.ORDER_START)
                 .totalPrice(new BigDecimal("245000"))
                 .memberId(1L)
                 .build();
@@ -42,7 +42,7 @@ class OrderServiceTest {
         when(orderRepository.save(changeStatusOrder)).thenReturn(changeStatusOrder);
         Order savedOrder = orderService.save(changeStatusOrder);
         //then
-        assertThat(savedOrder.getOrderStatus()).isEqualTo(OrderStatus.ORDER_ACCEPTED);
+        assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.ORDER_ACCEPTED);
     }
 
     @Test
@@ -51,8 +51,8 @@ class OrderServiceTest {
         //given
         Order order = Order.builder()
                 .id(1L)
-                .basketId(1L)
-                .orderStatus(OrderStatus.ORDER_ACCEPTED)
+                .orderItemId(1L)
+                .status(OrderStatus.ORDER_ACCEPTED)
                 .totalPrice(new BigDecimal("245000"))
                 .memberId(1L)
                 .build();
@@ -62,7 +62,7 @@ class OrderServiceTest {
 
         Order savedOrder = orderService.save(changeStatusOrder);
         //then
-        assertThat(savedOrder.getOrderStatus()).isEqualTo(OrderStatus.ORDER_CONFIRMED);
+        assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.ORDER_CONFIRMED);
     }
 
     @Test
@@ -71,8 +71,8 @@ class OrderServiceTest {
         //given
         Order order = Order.builder()
                 .id(1L)
-                .basketId(1L)
-                .orderStatus(OrderStatus.ORDER_CONFIRMED)
+                .orderItemId(1L)
+                .status(OrderStatus.ORDER_CONFIRMED)
                 .totalPrice(new BigDecimal("245000"))
                 .memberId(1L)
                 .build();
@@ -82,7 +82,7 @@ class OrderServiceTest {
 
         Order savedOrder = orderService.save(changeStatusOrder);
         //then
-        assertThat(savedOrder.getOrderStatus()).isEqualTo(OrderStatus.ORDER_CONFIRMED);
+        assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.ORDER_CONFIRMED);
     }
 
     @Test
@@ -91,8 +91,8 @@ class OrderServiceTest {
         //given
         Order order = Order.builder()
                 .id(1L)
-                .basketId(1L)
-                .orderStatus(OrderStatus.COOKING)
+                .orderItemId(1L)
+                .status(OrderStatus.COOKING)
                 .totalPrice(new BigDecimal("245000"))
                 .memberId(1L)
                 .build();
@@ -102,7 +102,7 @@ class OrderServiceTest {
 
         Order savedOrder = orderService.save(changeStatusOrder);
         //then
-        assertThat(savedOrder.getOrderStatus()).isEqualTo(OrderStatus.MENU_ALREADY_COMPLETE);
+        assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.MENU_ALREADY_COMPLETE);
     }
 
     @Test
@@ -111,8 +111,8 @@ class OrderServiceTest {
         //given
         Order order = Order.builder()
                 .id(1L)
-                .basketId(1L)
-                .orderStatus(OrderStatus.MENU_ALREADY_COMPLETE)
+                .orderItemId(1L)
+                .status(OrderStatus.MENU_ALREADY_COMPLETE)
                 .totalPrice(new BigDecimal("245000"))
                 .memberId(1L)
                 .build();
@@ -122,7 +122,7 @@ class OrderServiceTest {
 
         Order savedOrder = orderService.save(changeStatusOrder);
         //then
-        assertThat(savedOrder.getOrderStatus()).isEqualTo(OrderStatus.PICK_UP_COMPLETE);
+        assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.PICK_UP_COMPLETE);
     }
 
     @Test
@@ -131,8 +131,8 @@ class OrderServiceTest {
         //given
         Order order = Order.builder()
                 .id(1L)
-                .basketId(1L)
-                .orderStatus(OrderStatus.PICK_UP_COMPLETE)
+                .orderItemId(1L)
+                .status(OrderStatus.PICK_UP_COMPLETE)
                 .totalPrice(new BigDecimal("245000"))
                 .memberId(1L)
                 .build();
@@ -142,7 +142,7 @@ class OrderServiceTest {
 
         Order savedOrder = orderService.save(changeStatusOrder);
         //then
-        assertThat(savedOrder.getOrderStatus()).isEqualTo(OrderStatus.WHOLE_COMPLETE);
+        assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.WHOLE_COMPLETE);
     }
 
     @ParameterizedTest
@@ -154,8 +154,8 @@ class OrderServiceTest {
         //given
         Order order = Order.builder()
                 .id(1L)
-                .basketId(1L)
-                .orderStatus(inputStatus)
+                .orderItemId(1L)
+                .status(inputStatus)
                 .totalPrice(new BigDecimal("245000"))
                 .memberId(1L)
                 .build();
@@ -165,6 +165,6 @@ class OrderServiceTest {
 
         Order savedOrder = orderService.save(changeStatusOrder);
         //then
-        assertThat(savedOrder.getOrderStatus()).isEqualTo(OrderStatus.CANCEL);
+        assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.CANCEL);
     }
 }
