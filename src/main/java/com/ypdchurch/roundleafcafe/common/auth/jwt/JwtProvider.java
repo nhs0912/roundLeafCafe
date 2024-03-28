@@ -22,37 +22,39 @@ import java.util.UUID;
 @Getter
 @Configuration
 public class JwtProvider {
-    private static final int ONE_DAY = 1000 * 60 * 60 * 24; // 24시간
-    private static final int TWO_DAY = 1000 * 60 * 60 * 48; // 48시간
     public static final String TOKEN_PREFIX = "Bearer "; // 스페이스 필요함
     public static final String REFRESH_TOKEN_HEADER = "refreshToken";
+    private final String secretKey;
+    private final int accessValidTime;
+    private final int refreshValidTime;
 
-
-    private String secretKey;
-
-    public JwtProvider(@Value("${custom.jwt.secretKey}") String secretKey) {
+    public JwtProvider(@Value("${custom.jwt.secretKey}") String secretKey
+            , @Value("${custom.jwt.accessTokenTime}") int accessValidTime
+            , @Value("${custom.jwt.refreshTokenTime}") int refreshValidTime) {
         this.secretKey = secretKey;
+        this.accessValidTime = accessValidTime;
+        this.refreshValidTime = refreshValidTime;
     }
 
-    public String createAccessToken(String email) {
+    public String createAccessToken(String email, @Value("${custom.jwt.accessTokenTime}") int validTime) {
         return Jwts.builder()
                 .id(UUID.randomUUID().toString())
                 .header()
                 .type("JWT")
                 .and()
                 .subject(email)
-                .expiration(new Date(System.currentTimeMillis() + ONE_DAY))//a java.util.Date
+                .expiration(new Date(System.currentTimeMillis() + validTime))//a java.util.Date
                 .issuedAt(new Date(System.currentTimeMillis())) // for example, now
                 .claim("email", email)
                 .signWith(makeEncryptedSecretKey(secretKey))
                 .compact();//just an example id
     }
 
-    public String createRefreshToken(String email) {
+    public String createRefreshToken(String email, @Value("${custom.jwt.refreshTokenTIme}") int validTime) {
         return Jwts.builder()
                 .id(UUID.randomUUID().toString())
                 .subject(email)
-                .expiration(new Date(System.currentTimeMillis() + TWO_DAY))//a java.util.Date
+                .expiration(new Date(System.currentTimeMillis() + validTime))//a java.util.Date
                 .issuedAt(new Date(System.currentTimeMillis())) // for example, now
                 .claim("email", email)
                 .signWith(makeEncryptedSecretKey(secretKey))
@@ -72,16 +74,6 @@ public class JwtProvider {
     public Authentication getAuthentication(String token) {
         String email = this.findEmail(token);
         return new UsernamePasswordAuthenticationToken(email, token, null);
-    }
-
-    public boolean isValid(String token) {
-        try {
-            Jws<Claims> claimsJws = getClaims(token);
-            log.info("claimsJws isValid == {}", claimsJws);
-            return true;
-        } catch (JwtException e) {
-            return false;
-        }
     }
 
     public String findEmail(String token) {

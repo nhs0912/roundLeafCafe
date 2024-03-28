@@ -2,3 +2,5 @@ custom:
   jwt:
     #roundLeafCafe_ypdcchurch_2024
     secretKey: cm91bmRMZWFmQ2FmZV95cGRjY2h1cmNoXzIwMjQK
+    accessTokenTime:    3600 #1시간
+    refreshTokenTime:  86400 #24시간

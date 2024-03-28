@@ -60,8 +60,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private Token makeNewToken(Token foundAccessToken, String email) {
-        String newRefreshTokenText = jwtProvider.createRefreshToken(email);
-        String newAccessTokenText = jwtProvider.createAccessToken(email);
+        String newRefreshTokenText = jwtProvider.createRefreshToken(email, jwtProvider.getRefreshValidTime());
+        String newAccessTokenText = jwtProvider.createAccessToken(email, jwtProvider.getAccessValidTime());
         Token updateRefreshToken = foundAccessToken.updateRefreshToken(newRefreshTokenText);
         return updateRefreshToken.updateAccessToken(newAccessTokenText);
     }

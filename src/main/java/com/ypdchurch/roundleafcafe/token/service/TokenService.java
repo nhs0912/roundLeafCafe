@@ -52,15 +52,15 @@ public class TokenService {
         return tokenRepository.save(refreshToken);
     }
 
-    public Token updateRefreshToken(Token token) {
-        token.isValidRefreshToken(jwtProvider.getSecretKey());
-        String newRefreshToken = jwtProvider.createRefreshToken(token.getEmail());
-        return token.updateRefreshToken(newRefreshToken);
-    }
+//    public Token updateRefreshToken(Token token) {
+//        token.isValidRefreshToken(jwtProvider.getSecretKey());
+//        String newRefreshToken = jwtProvider.createRefreshToken(token.getEmail(), jwtProvider.getRefreshValidTime());
+//        return token.updateRefreshToken(newRefreshToken);
+//    }
 
     public AuthenticationTokens getAuthenticationTokens(String email) {
-        String refreshToken = jwtProvider.createRefreshToken(email);
-        String accessToken = jwtProvider.createAccessToken(email);
+        String refreshToken = jwtProvider.createRefreshToken(email, jwtProvider.getRefreshValidTime());
+        String accessToken = jwtProvider.createAccessToken(email, jwtProvider.getAccessValidTime());
         return AuthenticationTokens.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
