@@ -1,6 +1,5 @@
 package com.ypdchurch.roundleafcafe.menu.domain;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import com.ypdchurch.roundleafcafe.common.domain.BaseEntity;
 import com.ypdchurch.roundleafcafe.menu.enums.CategoryStatus;
 import jakarta.persistence.*;
@@ -23,5 +22,15 @@ public class Category extends BaseEntity {
 
     @Column(name = "status")
     private CategoryStatus status;
+
+    public Category show() {
+        this.status = CategoryStatus.SHOW;
+        return this;
+    }
+
+    public Category hide() {
+        this.status = CategoryStatus.HIDE;
+        return this;
+    }
 
 }
