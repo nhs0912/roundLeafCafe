@@ -23,6 +23,14 @@ public class Category extends BaseEntity {
     @Column(name = "status")
     private CategoryStatus status;
 
+    public boolean isShow() {
+        return this.status == CategoryStatus.SHOW;
+    }
+
+    public boolean isHide() {
+        return this.status == CategoryStatus.HIDE;
+    }
+
     public Category show() {
         this.status = CategoryStatus.SHOW;
         return this;
