@@ -4,8 +4,6 @@ import com.ypdchurch.roundleafcafe.common.auth.jwt.JwtProvider;
 import com.ypdchurch.roundleafcafe.common.exception.TokenCustomException;
 import com.ypdchurch.roundleafcafe.common.exception.code.TokenErrorCode;
 import com.ypdchurch.roundleafcafe.member.domain.Member;
-import com.ypdchurch.roundleafcafe.member.repository.MemberRepository;
-import com.ypdchurch.roundleafcafe.member.service.MemberService;
 import com.ypdchurch.roundleafcafe.token.domain.AuthenticationTokens;
 import com.ypdchurch.roundleafcafe.token.domain.Token;
 import com.ypdchurch.roundleafcafe.token.repository.TokenRepository;
@@ -17,15 +15,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @Slf4j

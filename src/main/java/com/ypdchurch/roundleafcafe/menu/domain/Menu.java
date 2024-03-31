@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Getter
@@ -24,6 +26,9 @@ public class Menu extends BaseEntity {
 
     @Column(name = "price")
     private BigDecimal price;
+
+    @OneToMany(mappedBy = "menu")
+    private List<MenuOption> menuOptions = new ArrayList<>();
 
     @Column(name = "category_id")
     private Long categoryId;

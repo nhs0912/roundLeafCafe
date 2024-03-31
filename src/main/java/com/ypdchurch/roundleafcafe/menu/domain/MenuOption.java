@@ -18,8 +18,10 @@ public class MenuOption extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "menu_option_id", updatable = false)
     private Long id;
-    @Column(name = "menu_id")
-    private Long menuId;
+
+    @ManyToOne
+    @JoinColumn(name = "menu_id")
+    private Menu menu;
 
     @Column(name = "option")
     private String option;
@@ -32,4 +34,8 @@ public class MenuOption extends BaseEntity {
 
     @Column(name = "status")
     private MenuOptionStatus status;
+    public void changeMenu(Menu menu) {
+        this.menu = menu;
+        this.menu.getMenuOptions().add(this);
+    }
 }
