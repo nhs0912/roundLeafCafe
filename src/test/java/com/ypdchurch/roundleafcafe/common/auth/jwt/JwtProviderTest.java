@@ -22,7 +22,7 @@ class JwtProviderTest {
     @Test
     @DisplayName("token 생성 테스트")
     void createTokenSuccessTest() {
-        String accessToken = jwtProvider.createAccessToken("tom@gmail.com");
+        String accessToken = jwtProvider.createAccessToken("tom@gmail.com", jwtProvider.getAccessValidTime());
         assertThat(accessToken).isNotNull();
     }
 
@@ -39,7 +39,7 @@ class JwtProviderTest {
                 .role(MemberRole.CUSTOMER)
                 .status(MemberStatus.ACTIVE)
                 .build();
-        String refreshToken = jwtProvider.createRefreshToken(tom.getEmail());
+        String refreshToken = jwtProvider.createRefreshToken(tom.getEmail(), jwtProvider.getRefreshValidTime());
         assertThat(refreshToken).isNotNull();
     }
 
@@ -56,7 +56,7 @@ class JwtProviderTest {
                 .role(MemberRole.CUSTOMER)
                 .status(MemberStatus.ACTIVE)
                 .build();
-        String accessToken = jwtProvider.createAccessToken(tom.getEmail());
+        String accessToken = jwtProvider.createAccessToken(tom.getEmail(), jwtProvider.getAccessValidTime());
         Jws<Claims> claims = jwtProvider.verify(accessToken);
         Claims payload = claims.getPayload();
         assertAll(

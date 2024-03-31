@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
     private final OrderService orderService;
 
-    @GetMapping("menu")
-    public String moveOrderPage() {
+    @GetMapping("menu/{menu}")
+    public String moveOrderPage(@RequestParam String menuKindCode) {
+        log.info("menuKindCode = {}", menuKindCode);
+
         return "order";
     }
 
@@ -30,5 +32,7 @@ public class OrderController {
         Order orderedMenu = orderService.orderMenu(order);
         return OrderMenuResponse.of(orderedMenu);
     }
+
+
 
 }

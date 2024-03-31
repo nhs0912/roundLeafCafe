@@ -67,10 +67,10 @@ public class Token extends BaseEntity {
         try {
             Jws<Claims> claimsJws = getClaims(token, secretKey);
             return true;
-        } catch (SecurityException | MalformedJwtException | io.jsonwebtoken.security.SignatureException e) {
-            throw new TokenCustomException(TokenErrorCode.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
             throw new TokenCustomException(TokenErrorCode.TOKEN_IS_EXPIRED);
+        } catch (SecurityException | MalformedJwtException | io.jsonwebtoken.security.SignatureException e) {
+            throw new TokenCustomException(TokenErrorCode.INVALID_TOKEN);
         }
     }
 

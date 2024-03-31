@@ -45,8 +45,8 @@ public class OrderMenuRequest {
                 .memberId(this.getMemberId())
                 .totalPrice(this.getTotalPrice())
                 .requests(this.getRequests())
-                .orderStatus(this.getOrderStatus())
-                .basketId(this.getBasketId())
+                .status(this.getOrderStatus())
+                .orderItemId(this.getBasketId())
                 .build();
     }
 }
