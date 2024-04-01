@@ -30,8 +30,9 @@ public class Menu extends BaseEntity {
     @OneToMany(mappedBy = "menu")
     private List<MenuOption> menuOptions = new ArrayList<>();
 
-    @Column(name = "category_id")
-    private Long categoryId;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @Enumerated(EnumType.STRING)
     private MenuStatus status;
@@ -41,5 +42,14 @@ public class Menu extends BaseEntity {
 
     @Column(name = "popular_rank")
     private int popularRank;
+
+    public Menu changeCategory(Category category) {
+        if(this.category.isExistMenu(this)){
+            category.removeMenu(this);
+        }
+        this.category = category;
+        this.category.addMenu(this);
+        return this;
+    }
 
 }

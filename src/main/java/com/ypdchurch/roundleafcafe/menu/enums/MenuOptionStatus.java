@@ -7,9 +7,9 @@ public enum MenuOptionStatus {
 
     SHOW("01"), HIDE("02");
 
-    private String value;
+    private final String value;
 
-    MenuOptionStatus(String value) {
+    MenuOptionStatus(final String value) {
         this.value = value;
     }
 }

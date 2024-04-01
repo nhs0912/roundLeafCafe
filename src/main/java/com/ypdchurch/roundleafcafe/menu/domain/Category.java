@@ -5,6 +5,9 @@ import com.ypdchurch.roundleafcafe.menu.enums.CategoryStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Builder
 @AllArgsConstructor
 @Getter
@@ -22,6 +25,23 @@ public class Category extends BaseEntity {
 
     @Column(name = "status")
     private CategoryStatus status;
+
+    @OneToMany(mappedBy = "category")
+    private List<Menu> menus = new ArrayList<>();
+
+    public List<Menu> removeMenu(Menu menu) {
+        menus.remove(menu);
+        return this.menus;
+    }
+
+    public List<Menu> addMenu(Menu menu) {
+        menus.add(menu);
+        return this.menus;
+    }
+
+    public boolean isExistMenu(Menu menu) {
+        return this.menus.contains(menu);
+    }
 
     public boolean isShow() {
         return this.status == CategoryStatus.SHOW;

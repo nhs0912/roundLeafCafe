@@ -6,9 +6,9 @@ import lombok.Getter;
 public enum CategoryStatus {
     SHOW("01"), HIDE("02");
 
-    private String value;
+    private final String value;
 
-    CategoryStatus(String value) {
+    CategoryStatus(final String value) {
         this.value = value;
     }
 }

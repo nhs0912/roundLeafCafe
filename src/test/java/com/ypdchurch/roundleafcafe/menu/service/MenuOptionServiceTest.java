@@ -1,7 +1,9 @@
 package com.ypdchurch.roundleafcafe.menu.service;
 
+import com.ypdchurch.roundleafcafe.menu.domain.Category;
 import com.ypdchurch.roundleafcafe.menu.domain.Menu;
 import com.ypdchurch.roundleafcafe.menu.domain.MenuOption;
+import com.ypdchurch.roundleafcafe.menu.enums.CategoryStatus;
 import com.ypdchurch.roundleafcafe.menu.enums.MenuOptionStatus;
 import com.ypdchurch.roundleafcafe.menu.repository.MenuOptionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +37,11 @@ class MenuOptionServiceTest {
     void setUp() {
         menu = Menu.builder()
                 .id(1L)
-                .categoryId(1L)
+                .category(Category.builder()
+                        .id(1L)
+                        .name("아이스크림")
+                        .status(CategoryStatus.SHOW)
+                        .build())
                 .price(new BigDecimal("250000"))
                 .name("엄마는 외계인")
                 .build();
