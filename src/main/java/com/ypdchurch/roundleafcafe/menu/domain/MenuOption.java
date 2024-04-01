@@ -34,8 +34,13 @@ public class MenuOption extends BaseEntity {
 
     @Column(name = "status")
     private MenuOptionStatus status;
+
     public void changeMenu(Menu menu) {
         this.menu = menu;
         this.menu.getMenuOptions().add(this);
+    }
+
+    public boolean isShow() {
+        return this.status == MenuOptionStatus.SHOW;
     }
 }
