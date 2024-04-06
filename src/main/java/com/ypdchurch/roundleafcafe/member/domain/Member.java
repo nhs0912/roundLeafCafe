@@ -33,6 +33,7 @@ public class Member extends BaseEntity {
     @Column
     private String name;
 
+    @Column(name = "phone_name")
     private String phoneNumber;
 
     @NotEmpty
