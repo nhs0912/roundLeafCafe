@@ -27,7 +27,7 @@ public class Category extends BaseEntity {
     private CategoryStatus status;
 
     @OneToMany(mappedBy = "category")
-    private List<Menu> menus = new ArrayList<>();
+    private final List<Menu> menus = new ArrayList<>();
 
     public List<Menu> removeMenu(Menu menu) {
         menus.remove(menu);

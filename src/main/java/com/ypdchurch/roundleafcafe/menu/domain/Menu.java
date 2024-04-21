@@ -28,7 +28,7 @@ public class Menu extends BaseEntity {
     private BigDecimal price;
 
     @OneToMany(mappedBy = "menu")
-    private List<MenuOption> menuOptions = new ArrayList<>();
+    private final List<MenuOption> menuOptions = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "category_id")
