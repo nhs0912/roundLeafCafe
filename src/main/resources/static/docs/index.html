@@ -680,7 +680,7 @@ Content-Length: 61
 <td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">주문상태</p></td>
 <td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">주문 상태는 처음 접하면</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">처음 상태 : ORDER_START(01)</p></td>
 </tr>
 </tbody>
 </table>
@@ -689,14 +689,14 @@ Content-Length: 61
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/order/menu HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Accept: application/json
-Content-Length: 145
+Content-Length: 141
 Host: api.roundLeafCafe.com
 
 {
   "memberId" : 1,
   "basketId" : 1,
   "totalPrice" : 2000,
-  "requests" : "요청사항이 많습니다!",
+  "requests" : "반찬 많이 주세요! ",
   "orderStatus" : "ORDER_ACCEPTED"
 }</code></pre>
 </div>
@@ -763,14 +763,14 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 Strict-Transport-Security: max-age=31536000 ; includeSubDomains
-Content-Length: 157
+Content-Length: 153
 
 {
   "id" : 1,
   "memberId" : 1,
   "basketId" : 1,
   "totalPrice" : 2000,
-  "requests" : "요청사항이 많습니다!",
+  "requests" : "반찬 많이 주세요! ",
   "orderStatus" : "ORDER_ACCEPTED"
 }</code></pre>
 </div>
@@ -782,7 +782,7 @@ Content-Length: 157
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-02-16 12:02:06 +0900
+Last updated 2024-02-17 13:48:43 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
